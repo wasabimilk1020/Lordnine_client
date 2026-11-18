@@ -708,9 +708,9 @@ def morning(sio, data,btn_name, character_name, handle):
   delay=data[4]
   name=character_name
 
+  #귀환 전에 여기에 길드 루틴
   keyboard('b') #귀환
 
-  
   result=img_search_utils.searchImg('good_store.png',beforeDelay=5, afterDelay=5, _region=(1500,660,420,300))
   if(result==0):
     return 0, "귀환 실패"
@@ -742,10 +742,10 @@ def morning(sio, data,btn_name, character_name, handle):
   if(result==0):
     return 0, "구매 실패"
 
+  escKey()
+  time.sleep(1)
+  
   #아래 상점 루틴인대 space 아두이노에 만들고 하자.
-  # escKey()
-  # time.sleep(1)
-
   # randClick(1580,60,10,10,3)  #상점 클릭
       
 
