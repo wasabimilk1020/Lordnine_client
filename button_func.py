@@ -68,10 +68,10 @@ def normalHunting(sio, data,btn_name, character_name, handle):
   keyboard('m')
   time.sleep(3)
 
-  randClick(835,690,0,0,0)  #사냥터 클릭
+  randClick(835,690,0,0,1)  #사냥터 클릭
   escKey()
-  time.sleep(10)
-  randClick(1760,720,5,5,0)
+  time.sleep(10)  #이게 사냥터 이동 임시 시간인대 다른 것으로 바꿔야함.
+  randClick(1760,720,5,5,1)
   img_search_utils.caputure_image(name, 180, 180, sio) #name, x, y, sio
   
   return 1, "message:None"
@@ -744,7 +744,7 @@ def morning(sio, data,btn_name, character_name, handle):
 
   escKey()
   time.sleep(1)
-  
+
   #아래 상점 루틴인대 space 아두이노에 만들고 하자.
   # randClick(1580,60,10,10,3)  #상점 클릭
       

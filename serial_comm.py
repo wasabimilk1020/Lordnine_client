@@ -156,27 +156,32 @@ def startClick(xVal, yVal, xRange, yRange, clkSleep):
     val = f'5!{randX}!{randY}'
     return execute_command(val)
 
+# ENTER (명령 6)
+def enterKey():
+    return execute_command('6')
 
 # WIN + B (명령 7)
 def winKey():
     return execute_command('7')
 
-
-# 기존 명령 10
-def winKey_1():
-    return execute_command('10')
-
+# WIN + LEFT (명령 8)
+def win_left():
+    return execute_command('8')
 
 # ESC (명령 9)
 def escKey():
     return execute_command('9')
 
+# 기존 명령 10
+def winKey_1():
+    return execute_command('10')
 
-# ENTER (명령 6)
-def enterKey():
-    return execute_command('6')
+def spaceKey():
+    return execute_command('12')
 
 
-# WIN + LEFT (명령 8)
-def win_left():
-    return execute_command('8')
+
+
+
+
+
