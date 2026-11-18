@@ -708,18 +708,50 @@ def morning(sio, data,btn_name, character_name, handle):
   delay=data[4]
   name=character_name
 
-  # 데일리 
-  daily(sio, data,btn_name, character_name, handle)
-  # 혈맹 
-  result_1=guild(sio, data,btn_name, character_name, handle)
-  if(result_1[0]==0):
-    return result_1[0], result_1[1]
-  #상점
-  result_2=store(sio, data,btn_name, character_name, handle)
-  if(result_2[0]==0):
-    return result_2[0], result_2[1]
+  keyboard('b') #귀환
 
-  img_search_utils.caputure_image(name, 387,258, sio) #name, x, y, sio
+  
+  result=img_search_utils.searchImg('good_store.png',beforeDelay=5, afterDelay=5, _region=(1500,660,420,300))
+  if(result==0):
+    return 0, "귀환 실패"
+
+  result=img_search_utils.searchImg('autoBuy.png',beforeDelay=0, afterDelay=1, chkCnt=15, justChk=True, _region=(75,845,350,200))
+  y=290
+  if(result!=0):
+    for i in range(3):
+      randClick(32,y,10,10,1)
+      result=img_search_utils.searchImg('autoBuy.png',beforeDelay=0, afterDelay=1, _region=(75,845,350,200))
+      result=img_search_utils.searchImg('good_confirm.png', beforeDelay=0, afterDelay=1, _region=(970,780,300,200))
+      if(result==0):
+        return 0, "확인 실패"
+      y=y+75 
+  else:
+    return 0, "우호상인 실패"
+  escKey()
+
+  result=img_search_utils.searchImg('roon_store.png',beforeDelay=1, afterDelay=5, _region=(1500,660,420,300))
+  if(result==0):
+    return 0, "룬 상인 실패"
+
+  result=img_search_utils.searchImg('roon.png',beforeDelay=0, afterDelay=1, chkCnt=10, _region=(85,115,300,300))
+  if(result==0):
+    return 0, "룬 클릭 실패"
+
+  randClick(1110,595,5,5,1) #max
+  result=img_search_utils.searchImg('buy.png', beforeDelay=0, afterDelay=1, _region=(970,745,300,200))
+  if(result==0):
+    return 0, "구매 실패"
+
+  #아래 상점 루틴인대 space 아두이노에 만들고 하자.
+  # escKey()
+  # time.sleep(1)
+
+  # randClick(1580,60,10,10,3)  #상점 클릭
+      
+
+
+
+  # img_search_utils.caputure_image(name, 387,258, sio) #name, x, y, sio
 
   return 1, "message:None"
 
