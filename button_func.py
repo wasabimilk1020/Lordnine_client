@@ -32,40 +32,47 @@ def normalHunting(sio, data,btn_name, character_name, handle):
   flag=data[4]
   name=character_name
 
-  if flag==1:
-    keyboard('7')
-    result_1=img_search_utils.searchImg('eventObj.png',beforeDelay=2, afterDelay=10, _region=(333,245,230,300)) 
-    #여기에 클릭 후 확인이라던지 있는지 없는지 확인 하고 더 만들어줘야함함
+  keyboard('b') #귀환
 
-  keyboard('v')
+  result=img_search_utils.searchImg('storeBuy.png',beforeDelay=5, afterDelay=5, _region=(1500,660,420,300))
+  if(result==0):
+    return 0, "귀환 실패"
 
-  img_search_utils.searchImg('stop_schedule.png',beforeDelay=0, afterDelay=0, chkCnt=2, _region=(1260,790,300,100))
-  randClick(1075,820,10,10,1) #초기화 클릭
+  result=img_search_utils.searchImg('autoBuy.png',beforeDelay=0, afterDelay=1, chkCnt=10, _region=(75,845,350,200))
+  if(result==0):
+    return 0, "자동구매 실패"
 
-  result_1=img_search_utils.searchImg('memory_place.png',beforeDelay=0, afterDelay=1, _region=(320,400,200,150)) #기억장소 메뉴 클릭
-  if(result_1==0):
-    return 0, "기억장소 메뉴 실패"
+  randClick(1045,800,10,10,1) #확인
+  escKey()
+  time.sleep(2)
+  keyboard('m') #지도
 
-  randClick(660,345,10,10,1)  #장소 클릭
+  result=img_search_utils.searchImg('favorite.png', beforeDelay=2, afterDelay=1, _region=(0,820,100,150))
+  if(result==0):
+    return 0, "즐겨찾기 실패"
 
-  result_coord=img_search_utils.searchImg('plus.png',beforeDelay=0, afterDelay=0, justChk=True, _region=(1450,340,200,100)) #시간충전 좌표
- 
-  if result_coord != 0:
-    for i in range(7):
-        randClick(result_coord[0], result_coord[1], 0, 0, 0.3)
-  else:
-      return 0, "시간충전 좌표 못찾음"
+  result=img_search_utils.searchImg('hunting_place.png', beforeDelay=0, afterDelay=2, _region=(70,220,250,400))
+  if(result==0):
+    return 0, "사냥터 클릭 실패"
 
-  result_2=img_search_utils.searchImg('clk_schedule_start.png',beforeDelay=0, afterDelay=0, _region=(1260,790,300,100))
-  if result_2==1: #마을 체크
-    result_village=img_search_utils.searchImg('portion.png',beforeDelay=0, afterDelay=0, chkCnt=30, justChk=True, _region=(340,245,200,300))
-    if result_village!=0: #마을이면 5초 후 다음
-      pass
-      # time.sleep(5)
-  else:
-    return 0, "스케쥴 시작 실패"
-    
-  img_search_utils.caputure_image(name, 387, 258, sio) #name, x, y, sio
+  result=img_search_utils.searchImg('hunting_portal.png', beforeDelay=0, afterDelay=1, _region=(1490,155,400,800))
+  if(result==0):
+    return 0, "포탈 클릭 실패"
+
+  randClick(1735,990,10,10,1) #빠른이동
+  result=img_search_utils.searchImg('confirm.png', beforeDelay=0, afterDelay=10, _region=(985,575,300,200))
+  if(result==0):
+    return 0, "확인 실패"
+
+  #지도 하기 전에 포탈 완료 됬는지 이미지 체크 필요 할듯
+  keyboard('m')
+  time.sleep(3)
+
+  randClick(835,690,0,0,0)  #사냥터 클릭
+  escKey()
+  time.sleep(10)
+  randClick(1760,720,5,5,0)
+  img_search_utils.caputure_image(name, 180, 180, sio) #name, x, y, sio
   
   return 1, "message:None"
 

@@ -5,10 +5,12 @@ from button_func import *
 import win32gui
 from PIL import ImageGrab,ImageEnhance,Image,ImageOps,ImageFilter
 
-x, y, width, height = 1270,330, 300, 300 #매칭 위치
-match_list=["gift_1.png"]
-match_result=img_search_utils.img_matchTemplate(match_list, x, y, width, height,confidence=0.8)
-print("match_result",match_result)
+time.sleep(2)
+escKey()
+# keyboard('g')
+# time.sleep(2)
+# startClick(1780,70,0,0,0)   #로드나인
 
+# startClick(920,195,0,0,0)
 
 

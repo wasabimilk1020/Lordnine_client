@@ -21,63 +21,10 @@ def get_lin2m_hwnd_list():
   for hwnd in hwnd_list:
     title = win32gui.GetWindowText(hwnd)
     result = title.split(' ')[0].strip()
-    if result == "리니지2M":
+    if result == "LORDNINE":
       lin2m_handle_list.append(hwnd)
   return lin2m_handle_list
 
-# def get_account_list(sio):
-#   account_dict={} #{"아이디":handle value}
-#   lin2m_handle_list=get_lin2m_hwnd_list()
-
-#   for lin2m_hwnd in lin2m_handle_list:
-#     client_utils.getWindow(lin2m_hwnd)
-#     name_server_list=[]
-       
-#     dragValues={'fromStartX':900, 'toStartX':1015,'fromStartY':590,'toStartY':620,'fromEndX':860, 'toEndX':1000,'fromEndY':325,'toEndY':345}
-#     mouseDrag(dragValues)
-#     time.sleep(2)   #실제로는 열렸는지 확인하는 코드 넣어야됨
-
-#     keyboard('x')
-  
-#     result=client_utils.searchImg('information.png',beforeDelay=1, afterDelay=1, _region=(1330, 225, 200, 100))
-#     if(result==0):
-#       print("정보 클릭 실패")
-#       continue
-#       #서버에 실패를 보낼 방법이 없네 이름이 아직 없는 상태라서...
-    
-#     coords=[[1200, 345, 130, 50],[1220,470,100,35]]
-#     for coord in coords:
-#       x, y, width, height = coord
-#       config="--psm 7 -c preserve_interword_spaces=1"
-#       binary_value=130
-
-#       # 문자 추출 실행
-#       for i in range(3):
-#         extracted_text = client_utils.capture_text_from_region(x, y, width, height, config,binary_value)
-#         if extracted_text[0] != "":  #성공
-#           if(extracted_text[0]!=0):
-#             name_server_list.append(extracted_text[0].split(' ')[0].strip())
-#           break
-#         elif extracted_text[0]=="":
-#           print("이름 추출 실패")
-#         time.sleep(1)
-
-#     if extracted_text[0]==0:
-#       continue
-    
-#     name=name_server_list[0]
-#     server=name_server_list[1]
-#     server_and_name=f"({server}) {name}"
-  
-#     account_dict[server_and_name]=lin2m_hwnd
-      
-#     escKey() 
-#     #절전모드
-#     keyboard('g')
-#     randClick(960,535,20,20,1)
-#     sio.emit("logEvent",["어카운트 완료", name, 1])
-
-#   return account_dict
 
 def get_account_list(sio):
   account_dict={} #{"아이디":handle value}
@@ -87,10 +34,10 @@ def get_account_list(sio):
     raw_title = win32gui.GetWindowText(hwnd)
     
     # "리니지2M l " 제거
-    clean_title = re.sub(r"^리니지2M\s*l\s*", "", raw_title).strip()
-
+    clean_title = re.sub(r"^LORDNINE\s*l\s*", "", raw_title).strip()
+    
     if clean_title:  # 빈 문자열은 제외
-        account_dict[clean_title] = hwnd
+        account_dict[hwnd] = hwnd
   # 가나다 순으로 정렬
   sorted_dict = dict(sorted(account_dict.items(), key=lambda x: x[0]))
 

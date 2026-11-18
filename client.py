@@ -85,7 +85,6 @@ def disconnect():
 def reqAccount(data):
   global character_list   
   character_list=get_account.get_account_list(sio) #윈도우를 돌면서 어카운트 정보를 얻음
-
   sio.emit("revAccount", character_list)
 
 #이렇게 일일이 버튼을 맵핑시켜주는게 아니라 버튼 생성하면 저절로 처리되도록 만들고 싶은데...

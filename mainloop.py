@@ -14,6 +14,7 @@ def mainLoop(sio, btn_func, func_data, id_handle, btn_name):
   _idx=0
   dict_length=len(id_handle)-1
   for idx, (id, handle) in enumerate(id_handle):
+    print("메인루프", idx)
     _idx=idx
     character_name=id
     if win32gui.IsWindow(handle):
