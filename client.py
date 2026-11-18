@@ -113,7 +113,7 @@ button_mapping={
   "모두":button_func.switch_get_item,
   "고급":button_func.switch_get_item,
   "희귀":button_func.switch_get_item,
-  "40M":button_func.fourty,
+  "10M":button_func.ten_meter,
   "제한없음":button_func.unlimit,
   # "바람":button_func.decomposeItem,
   # "불":button_func.decomposeItem,

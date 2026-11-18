@@ -70,7 +70,7 @@ def normalHunting(sio, data,btn_name, character_name, handle):
 
   randClick(835,690,0,0,1)  #사냥터 클릭
   escKey()
-  time.sleep(10)  #이게 사냥터 이동 임시 시간인대 다른 것으로 바꿔야함.
+  time.sleep(20)  #이게 사냥터 이동 임시 시간인대 다른 것으로 바꿔야함.
   randClick(1760,720,5,5,1)
   img_search_utils.caputure_image(name, 180, 180, sio) #name, x, y, sio
   
@@ -564,21 +564,22 @@ def event_store(sio, data,btn_name, character_name, handle):
   result=normalHunting(sio, data,btn_name, character_name, handle)
   return result
 
-#거리 40M
-def fourty(sio, data,btn_name, character_name, handle):
+#거리 10M
+def ten_meter(sio, data,btn_name, character_name, handle):
   coord=data
   delay=data[4]
   name=character_name
 
   keyboard("x") #환경설정
 
-  result=img_search_utils.searchImg('fourty_meter.png', beforeDelay=1, afterDelay=1, _region=(1065,710,550,200)) 
+  result=img_search_utils.searchImg('ten_meter.png', beforeDelay=1, afterDelay=1, _region=(1075,255,850,150)) 
   if(result==0):
-    return 0, "40M 클릭 실패"
+    return 0, "10M 클릭 실패"
 
-  img_search_utils.caputure_image(name, 1300, 720, sio) #name, x, y, sio
+  img_search_utils.caputure_image(name, 1210, 290, sio) #name, x, y, sio
 
   escKey()  #나가기
+  time.sleep(1)
 
   return 1, "message:None"
 
@@ -591,13 +592,14 @@ def unlimit(sio, data,btn_name, character_name, handle):
   keyboard("x") #환경설정
   
 
-  result=img_search_utils.searchImg('unlimit_meter.png', beforeDelay=1, afterDelay=1, _region=(1065,710,550,200)) 
+  result=img_search_utils.searchImg('unlimit_meter.png', beforeDelay=1, afterDelay=1, _region=(1075,255,850,150)) 
   if(result==0):
     return 0, "제한없음 클릭 실패"
 
-  img_search_utils.caputure_image(name, 1450,720, sio) #name, x, y, sio
+  img_search_utils.caputure_image(name, 1765,290, sio) #name, x, y, sio
 
   escKey()  #나가기
+  time.sleep(1)
 
   return 1, "message:None"
 
