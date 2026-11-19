@@ -721,6 +721,8 @@ def morning(sio, data,btn_name, character_name, handle):
 
   #--길드
   keyboard('.') #길드
+  time.sleep(2)
+  #화면 전화 의미 없는 것 하지 말고 길드 들어 갔을 때 나오는 문자를 이미지서치하자.
   randClick(910,585,10,10,2)  #화면 전환을 위한 클릭
   spaceKey()  #길드 기부
   result=img_search_utils.searchImg('donation.png',beforeDelay=2, afterDelay=1, _region=(690,665,200,150))
