@@ -719,9 +719,36 @@ def morning(sio, data,btn_name, character_name, handle):
   delay=data[4]
   name=character_name
 
-  #귀환 전에 여기에 길드 루틴
+  #--길드
+  keyboard('.') #길드
+  randClick(910,585,10,10,2)  #화면 전환을 위한 클릭
+  spaceKey()  #길드 기부
+  result=img_search_utils.searchImg('donation.png',beforeDelay=2, afterDelay=1, _region=(690,665,200,150))
+  if(result==0):
+    return 0, "기부 실패"
+  else: 
+    for i in range(5):
+      randClick(750,720,0,0,1)
+    escKey()
+    time.sleep(1)
+    escKey()
+    time.sleep(1)
+
+  #--상점
+  keyboard('u') #상점
+  time.sleep(3)
+  spaceKey()
+  time.sleep(2)
+  spaceKey()
+  time.sleep(2)
+  spaceKey()
+  time.sleep(5)
+  escKey()
+  time.sleep(1)
+  
   keyboard('b') #귀환
 
+  #--우호도 상인
   result=img_search_utils.searchImg('good_store.png',beforeDelay=5, afterDelay=5, _region=(1500,660,420,300))
   if(result==0):
     return 0, "귀환 실패"
@@ -740,6 +767,7 @@ def morning(sio, data,btn_name, character_name, handle):
     return 0, "우호상인 실패"
   escKey()
 
+  #--룬 상인
   result=img_search_utils.searchImg('roon_store.png',beforeDelay=1, afterDelay=5, _region=(1500,660,420,300))
   if(result==0):
     return 0, "룬 상인 실패"
