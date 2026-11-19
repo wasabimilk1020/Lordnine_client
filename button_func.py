@@ -60,18 +60,26 @@ def normalHunting(sio, data,btn_name, character_name, handle):
     return 0, "포탈 클릭 실패"
 
   randClick(1735,990,10,10,1) #빠른이동
-  result=img_search_utils.searchImg('confirm.png', beforeDelay=0, afterDelay=10, _region=(985,575,300,200))
+  result=img_search_utils.searchImg('confirm.png', beforeDelay=0, afterDelay=7, _region=(985,575,300,200))
   if(result==0):
     return 0, "확인 실패"
 
-  #지도 하기 전에 포탈 완료 됬는지 이미지 체크 필요 할듯
+  result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(1590,0,330,150))
+  if(result==0):
+    return 0, "이동 체크 실패"
   keyboard('m')
-  time.sleep(3)
+  result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+  if(result==0):
+    return 0, "지도 체크 실패"
 
   randClick(835,690,0,0,1)  #사냥터 클릭
   escKey()
-  time.sleep(20)  #이게 사냥터 이동 임시 시간인대 다른 것으로 바꿔야함.
-  randClick(1760,720,5,5,1)
+  time.sleep(5)  
+  for i in range(50):
+    result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
+    if(result==0):
+      break
+  randClick(1760,720,5,5,1) #공격
   img_search_utils.caputure_image(name, 180, 180, sio) #name, x, y, sio
   
   return 1, "message:None"
