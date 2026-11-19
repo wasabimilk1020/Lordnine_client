@@ -4,13 +4,13 @@ import time
 from button_func import *
 import win32gui
 from PIL import ImageGrab,ImageEnhance,Image,ImageOps,ImageFilter
+import utils
 
-time.sleep(2)
-escKey()
-# keyboard('g')
-# time.sleep(2)
-# startClick(1780,70,0,0,0)   #로드나인
+# img_search_utils.preprocess_image("hunting.png",r"C:\Users\wntuw\Documents\Lordnine_client\image_files\hunting.png")
 
-# startClick(920,195,0,0,0)
+x, y, width, height = 835,700, 250, 150 #매칭 위치
 
+match_list=["hunting.png"]
 
+match_result=img_search_utils.img_matchTemplate(match_list, x, y, width, height)
+print(match_result)

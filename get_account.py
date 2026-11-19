@@ -37,7 +37,7 @@ def get_account_list(sio):
     clean_title = re.sub(r"^LORDNINE\s*l\s*", "", raw_title).strip()
     
     if clean_title:  # 빈 문자열은 제외
-        account_dict[hwnd] = hwnd
+        account_dict[str(hwnd)] = hwnd
   # 가나다 순으로 정렬
   sorted_dict = dict(sorted(account_dict.items(), key=lambda x: x[0]))
 

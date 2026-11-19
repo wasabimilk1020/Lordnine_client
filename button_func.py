@@ -16,14 +16,14 @@ def statusChk(sio, data, btn_name, character_name, handle):
  
   value=check_hunting.checkHunting() #value=성공 시=문자열, 실패 시=0
   if value[0]==0: #0을 return (사냥을 하지 않고 있다는 뜻)
-    result=waking_from_sleep_and_deathChk(btn_name, sleep_time=2)
+    result=waking_from_sleep_and_deathChk(btn_name, sleep_time=2, death_routine=1)
     if result==1: #사망 체크를 수행 했는대 chk.png가 확인 안되서 실패
       return 0, "페널티 체크 루틴 실패"
     result=normalHunting(sio, data, btn_name, character_name, handle)
     return result
   elif value[0]==2: #capture_text_from_region 예외 발생
     return 1, value[1]
-  else:  #성공
+  else:  #성공 
     text=value[0]
     return 2, text  #다른 일반 버튼 루틴과 다르게 처리하기 위해서statusChk완료를 2를 리턴함으로서 알림.
 
@@ -333,17 +333,26 @@ def decomposeItem(sio, data,btn_name, character_name, handle):
   delay=data[4]
   name=character_name
 
-  keyboard("0") #분해
+  keyboard("i") #인벤토리
   time.sleep(1)
+  randClick(1850,310,5,5,1) #장비 메뉴
+  randClick(1540,520,5,5,2) #아이템 클릭
+  result=img_search_utils.searchImg('decompose_item.png', beforeDelay=0, afterDelay=2, _region=(1265,645,200,200))
+  if(result==0):
+    return 0, "분해 클릭 실패"
 
-  randClick(1480,735,5,5,1) #분해 목록
-  randClick(1395,730,10,10,1) #분해 목록 확인
-  randClick(1321,735,5,5,1) #분해
-
-  img_search_utils.searchImg('confirm.png', beforeDelay=1, afterDelay=1, chkCnt=2, _region=(920,580,300,200))
+  result=img_search_utils.searchImg('item_auto_registration.png', beforeDelay=0, afterDelay=2, _region=(1290,805,300,150))
+  if(result==0):
+    return 0, "아이템분해 실패"
   
-  img_search_utils.caputure_image(name, 1280, 340, sio) #name, x, y, sio
-
+  spaceKey()
+  time.sleep(2)
+  spaceKey()
+  time.sleep(1)
+  img_search_utils.caputure_image(name, 459, 285, sio) #name, x, y, sio
+  escKey()
+  time.sleep(1)
+  
   return 1, "message:None"
 
 def decomposeBook(sio, data,btn_name, character_name,handle):

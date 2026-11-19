@@ -146,23 +146,31 @@ button_mapping={
 }
 
 @sio.event
-def button_schedule(data):
-  global character_list
-#emit_data={"버튼이름":[데이터],"character_list":{"아이디1":핸들 값1,"아이디2":핸들 값2}}
-  for idx, (key, value) in enumerate(data.items()):
-    if idx==0:
-      button_name=key
-      func_data=value
-    elif idx==1:
-      if  value=={}:  #statusChk
-        id_handle=list(character_list.items())
-      else:
-        id_handle=list(value.items())
-  
-  # 버튼에 해당하는 함수 가져오기
-  print("버튼이름: ",button_name)
-  btn_func = button_mapping[button_name]
+def button_schedule(data):  #data={"버튼이름":[데이터],"character_list":{"아이디1":핸들 값1,"아이디2":핸들 값2}}
+  #global 변수 character_list
 
+  # character_list를 제외한 키가 버튼 이름
+  button_name = next((key for key in data if key != "character_list"), None)
+
+  if button_name is None:
+      print("버튼 이름 없음")
+      return
+  
+  func_data = data[button_name]
+  if len(func_data) != 5:
+    print("데이터 개수 오류")
+    return
+  
+  # 대상 캐릭터 목록
+  selected = data.get("character_list", {})
+  if selected == {}:
+      id_handle = list(character_list.items())
+  else:
+      id_handle = list(selected.items())
+
+  # 버튼에 해당하는 함수 가져오기
+  print("버튼이름:", button_name)
+  btn_func = button_mapping[button_name]
   # mainLoop 호출을 큐에 추가
   task_queue.put((mainLoop, (sio, btn_func, func_data, id_handle, button_name)))
 
@@ -241,4 +249,5 @@ sio.connect(f"{server_url}?computer_id={computer_id}")
 
 sio.wait()
 
-
+#길드, 상점 루틴
+#사냥터 이동 시간으로 하지 말고 확실한 뭔가로 바꾸자

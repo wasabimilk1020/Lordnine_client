@@ -64,49 +64,23 @@ def caputure_image(name,x,y,sio):
   data=[name, nowDatetime, captureImg] 
   sio.emit("captured_image",data)
 
-# def getWindow(handle):
-#   startClick(0,0,0,0,0)
-#   time.sleep(0.1)
-#   shell.SendKeys('%')
-#   try:
-#     win32gui.SetForegroundWindow(handle)  # 창을 앞으로 가져오기 시도
-#   except Exception as e:
-#     return 0, "Error bringing window to foreground"
-  
-#   for _ in range(10): # 최대 3초 동안 (0.3초 간격으로 10번) 창 활성화 확인
-#       if win32gui.GetForegroundWindow() == handle:
-#           return 1, "성공" 
-#       time.sleep(0.3)  
-#   return 0, "Error: Window did not come to foreground within timeout."
-
-# import win32process, win32api
-
-# def forceForeground(handle):
-#     fg = win32gui.GetForegroundWindow()
-#     tid1 = win32api.GetCurrentThreadId()
-#     tid2 = win32process.GetWindowThreadProcessId(fg)[0]
-#     tid3 = win32process.GetWindowThreadProcessId(handle)[0]
-
-#     win32api.AttachThreadInput(tid1, tid2, True)
-#     win32api.AttachThreadInput(tid1, tid3, True)
-
-#     win32gui.ShowWindow(handle, 5)
-#     win32gui.SetForegroundWindow(handle)
-
-#     win32api.AttachThreadInput(tid1, tid2, False)
-#     win32api.AttachThreadInput(tid1, tid3, False)
-
-
 def getWindow(handle):
-    try:
-      time.sleep(0.1)
-      shell.SendKeys('%')
-      win32gui.SetForegroundWindow(handle)
-      startClick(850,440,100,100,0)
-    except:
-      pass  # 실패해도 무시
+  try:
+    time.sleep(0.1)
+    shell.SendKeys('%')
+    win32gui.SetForegroundWindow(handle)
+    time.sleep(0.1)
 
+    if win32gui.GetForegroundWindow() != handle:
+        return 0, "윈도우 활성화 실패"
+    
+    startClick(850, 440, 100, 100, 0)
     return 1, "성공"
+  
+  except Exception as e:
+    return 0, f"윈도우 오류: {e}"
+
+    
 
 # x, y, width, height = 810, 660, 295, 65 #자동 사냥 범위
 # config="--psm 7 -c preserve_interword_spaces=1"
@@ -167,7 +141,7 @@ def preprocess_image(temp_imgTitle, output_path):  #이미지 전처리
   # 저장
   cv2.imwrite(output_path, sharpened)
 
-def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.6):
+def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75):
     # ---------- 타겟 캡처 ----------
     bbox = (x, y, x + width, y + height)
     target_pil = ImageGrab.grab(bbox)
