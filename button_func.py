@@ -87,6 +87,7 @@ def normalHunting(sio, data,btn_name, character_name, handle):
     if(result==0):
       break
 
+  randClick(1760,720,5,5,1) #공격 
   result=img_search_utils.find_hsv_center(1749, 701, 41, 37, lower=(14, 176, 60), upper=(26, 249, 183), min_area=300) #주황색 hsv 공격 중
   if(result==None):
     randClick(1760,720,5,5,1) #공격 
@@ -153,7 +154,8 @@ def dungeon(sio, data, btn_name, character_name, handle):
       result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
       if(result==0):
         break
-  
+
+    randClick(1760,720,5,5,1) #공격 
     result=img_search_utils.find_hsv_center(1749, 701, 41, 37, lower=(14, 176, 60), upper=(26, 249, 183), min_area=300) #주황색 hsv 공격 중
     if(result==None):
       randClick(1760,720,5,5,1) #공격 
@@ -197,7 +199,8 @@ def dungeon(sio, data, btn_name, character_name, handle):
       result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
       if(result==0):
         break
-  
+
+    randClick(1760,720,5,5,1) #공격
     result=img_search_utils.find_hsv_center(1749, 701, 41, 37, lower=(14, 176, 60), upper=(26, 249, 183), min_area=300) #주황색 hsv 공격 중
     if(result==None):
       randClick(1760,720,5,5,1) #공격 
@@ -301,7 +304,8 @@ def dungeon(sio, data, btn_name, character_name, handle):
       result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
       if(result==0):
         break
-  
+
+    randClick(1760,720,5,5,1) #공격
     result=img_search_utils.find_hsv_center(1749, 701, 41, 37, lower=(14, 176, 60), upper=(26, 249, 183), min_area=300) #주황색 hsv 공격 중
     if(result==None):
       randClick(1760,720,5,5,1) #공격 
