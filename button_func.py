@@ -166,6 +166,11 @@ def normalHunting(sio, data,btn_name, character_name, handle):
   result, message = move_on_map(835, 690, 3, 3, 1)
   if result == 0:
     return 0, message
+  
+  for i in range(50):
+    result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
+    if(result==0):
+      break
 
   #공격
   result, message = start_attack()
