@@ -64,7 +64,7 @@ def normalHunting(sio, data,btn_name, character_name, handle):
 
   match_list=["chk.png"]
   match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
-  if(match_result==0 or match_result==2):
+  if(match_result[0]==0 or match_result[0]==2):
     return 0, "이동 체크 실패"
   time.sleep(2)
 
@@ -138,7 +138,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
     #이동 완료 체크
     match_list=["chk.png"]
     match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
-    if(match_result==0 or match_result==2):
+    if(match_result[0]==0 or match_result[0]==2):
       return 0, "이동 체크 실패"
     time.sleep(2)
 
@@ -178,7 +178,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
     #이동 완료 체크
     match_list=["chk.png"]
     match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
-    if(match_result==0 or match_result==2):
+    if(match_result[0]==0 or match_result[0]==2):
       return 0, "이동 체크 실패"
     time.sleep(2)
 
@@ -219,7 +219,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
     #이동 완료 체크
     match_list=["chk.png"]
     match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
-    if(match_result==0 or match_result==2):
+    if(match_result[0]==0 or match_result[0]==2):
       return 0, "이동 체크 실패"
     time.sleep(2)
 
@@ -278,7 +278,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
     #이동 완료 체크
     match_list=["chk.png"]
     match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
-    if(match_result==0 or match_result==2):
+    if(match_result[0]==0 or match_result[0]==2):
       return 0, "이동 체크 실패"
     time.sleep(2)
 

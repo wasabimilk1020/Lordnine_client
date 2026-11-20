@@ -141,54 +141,53 @@ def preprocess_image(temp_imgTitle, output_path):  #이미지 전처리
   # 저장
   cv2.imwrite(output_path, sharpened)
 
-def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75):
-    # ---------- 타겟 캡처 ----------
+def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75, chk_cnt=5):
+
     bbox = (x, y, x + width, y + height)
-    target_pil = ImageGrab.grab(bbox)
-    # target_pil.show()
-    # target_pil.save("debug_capture.png")
 
-    # PIL → OpenCV
-    img = cv2.cvtColor(np.array(target_pil), cv2.COLOR_RGB2BGR)
+    for cnt in range(chk_cnt):
+        # 화면 캡처
+        target_pil = ImageGrab.grab(bbox)
+        img = cv2.cvtColor(np.array(target_pil), cv2.COLOR_RGB2BGR)
 
-    # ---------- 타겟 전처리 ----------
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # 전처리
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        contrast = clahe.apply(gray)
 
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    contrast = clahe.apply(gray)
+        kernel = np.array([[0, -1, 0],
+                           [-1, 5, -1],
+                           [0, -1, 0]])
 
-    kernel = np.array([[0, -1, 0],
-                       [-1, 5, -1],
-                       [0, -1, 0]])
-    sharpened = cv2.filter2D(contrast, -1, kernel)
+        sharpened = cv2.filter2D(contrast, -1, kernel)
 
-    # _, binary = cv2.threshold(
-    #     sharpened, 0, 255,
-    #     cv2.THRESH_BINARY + cv2.THRESH_OTSU
-    # )
-    # cv2.imshow("binary", binary)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+        # 템플릿 검색
+        for title in temp_img_list:
+            template_path = utils.file_path(title, "image_files")
+            template_img = cv2.imread(
+                template_path, cv2.IMREAD_GRAYSCALE
+            )
 
-    # ---------- 매칭 ----------
-    for title in temp_img_list:
-      # 템플릿 경로
-      template_path = utils.file_path(f"{title}", "image_files")
+            if template_img is None:
+                raise ValueError(f"템플릿 로드 실패: {template_path}")
 
-      # 전처리된 템플릿 이미지 로드 (그레이로)
-      template_img = cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)
-      if template_img is None:
-          raise ValueError(f"템플릿 로드 실패: {template_path}")
+            try:
+                result = cv2.matchTemplate(
+                    sharpened, template_img, cv2.TM_CCOEFF_NORMED
+                )
+            except Exception as e:
+                return 2, f"템플릿매칭 오류 발생: {e}"
 
-      try:
-        result = cv2.matchTemplate(sharpened, template_img, cv2.TM_CCOEFF_NORMED) 
-      except Exception as e:
-        return 2, f"템플릿매칭 오류 발생: {e}"
-      _, max_val, _, max_loc = cv2.minMaxLoc(result)
+            _, max_val, _, max_loc = cv2.minMaxLoc(result)
 
-      if max_val >= confidence: #매칭 성공
-        return title, "capture_text 성공", max_val, max_loc
-    return 0, max_val
+            if max_val >= confidence:
+                return title, "capture_text 성공", max_val, max_loc
+
+        # 마지막 검사에서는 기다릴 필요 없음
+        if cnt < chk_cnt - 1:
+            time.sleep(0.5)
+
+    return 0, "템플릿 검색 실패"
 
 def find_hsv_center(x, y, width, height, lower, upper, min_area=300):
 
