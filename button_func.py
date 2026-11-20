@@ -71,7 +71,10 @@ def normalHunting(sio, data,btn_name, character_name, handle):
     return 0, "지도 체크 실패"
 
   randClick(835,690,3,3,1)  #지도에서 위치 클릭
-  escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+  escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네 
+  result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
+  if(result==1):
+    escKey()
   time.sleep(5)  
   for i in range(50):
     result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
@@ -130,6 +133,9 @@ def dungeon(sio, data, btn_name, character_name, handle):
 
     randClick(960,700,3,3,1)  #지도에서 위치 클릭
     escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
+    if(result==1):
+      escKey()
     time.sleep(5)  
     for i in range(50):
       result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
@@ -165,6 +171,9 @@ def dungeon(sio, data, btn_name, character_name, handle):
 
     randClick(900,490,3,3,1)  #지도에서 위치 클릭
     escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
+    if(result==1):
+      escKey()
     time.sleep(5)  
     for i in range(50):
       result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
@@ -258,6 +267,9 @@ def dungeon(sio, data, btn_name, character_name, handle):
 
     randClick(940,610,3,3,1)  #지도에서 위치 클릭
     escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
+    if(result==1):
+      escKey()
     time.sleep(5)  
     for i in range(50):
       result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))

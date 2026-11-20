@@ -8,12 +8,16 @@ STATUS_MSG = 1
 
 def go_to_sleep_and_huntingChk(btn_name, character_name, sio):
   serial_comm.keyboard('g')
-  time.sleep(1) #임시 절전모드 체크 루틴 활성화 하면 없애자
 
-  # for i in range(3):
-  #   result=img_search_utils.searchImg('sleepChk.png', beforeDelay=1, afterDelay=0,  chkCnt=2, _region=(850, 455, 200, 200))  
-  #   if result ==1:
-  #     break
+  for i in range(3):
+    result=img_search_utils.searchImg('sleepChk.png', beforeDelay=1, afterDelay=0, _region=(811, 638, 299, 232)) 
+    if(result==1):
+      sio.emit("logEvent",["사냥 완료", character_name, STATUS_MSG])
+      return
+    
+  sio.emit("logEvent",["사냥 실패", character_name, ERR_MSG])
+
+
   
   # value=check_hunting.checkHunting()  #value=성공 시="자동 사냥 중" or "스케줄 자동 진행 중", 실패 시=0
   # if value[0]==0: #0을 return (사냥을 하지 않고 있다는 뜻)
