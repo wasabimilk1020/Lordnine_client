@@ -68,21 +68,13 @@ def normalHunting(sio, data,btn_name, character_name, handle):
     return 0, "이동 체크 실패"
   time.sleep(2)
 
-  # def checkHunting():
-  #   for i in range(5):
-  #     match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
-  #     if match_result[0]==2:  #템플릿 매칭 예외 발생
-  #       return match_result[0], match_result[1]
-  #     elif match_result[0] in match_list: #매칭 성공 return title, "capture_text 성공", max_val, max_loc
-  #       return match_result[0].replace(".png", ""), ""
-    
-  # result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-  # if(result==0):
-  #   return 0, "이동 체크 실패"
   keyboard('m')
   result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
   if(result==0):
-    return 0, "지도 체크 실패"
+    keyboard('m')
+    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+    if(result==0):
+      return 0, "지도 체크 실패"
 
   randClick(835,690,3,3,1)  #지도에서 위치 클릭
   escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네 
@@ -145,14 +137,18 @@ def dungeon(sio, data, btn_name, character_name, handle):
     keyboard('m')
     result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
     if(result==0):
-      return 0, "지도 체크 실패"
-
+      keyboard('m')
+      result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+      if(result==0):
+        return 0, "지도 체크 실패"
+  
     randClick(960,700,3,3,1)  #지도에서 위치 클릭
-    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네 
     result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
     if(result==1):
       escKey()
-    time.sleep(5)  
+    time.sleep(5) 
+  
     for i in range(50):
       result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
       if(result==0):
@@ -185,14 +181,18 @@ def dungeon(sio, data, btn_name, character_name, handle):
     keyboard('m')
     result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
     if(result==0):
-      return 0, "지도 체크 실패"
-
+      keyboard('m')
+      result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+      if(result==0):
+        return 0, "지도 체크 실패"
+  
     randClick(900,490,3,3,1)  #지도에서 위치 클릭
-    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네 
     result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
     if(result==1):
       escKey()
-    time.sleep(5)  
+    time.sleep(5) 
+    
     for i in range(50):
       result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
       if(result==0):
@@ -285,14 +285,18 @@ def dungeon(sio, data, btn_name, character_name, handle):
     keyboard('m')
     result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
     if(result==0):
-      return 0, "지도 체크 실패"
-
+      keyboard('m')
+      result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+      if(result==0):
+        return 0, "지도 체크 실패"
+  
     randClick(940,610,3,3,1)  #지도에서 위치 클릭
-    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네 
     result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
     if(result==1):
       escKey()
-    time.sleep(5)  
+    time.sleep(5) 
+    
     for i in range(50):
       result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
       if(result==0):
