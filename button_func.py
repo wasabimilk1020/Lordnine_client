@@ -62,9 +62,23 @@ def normalHunting(sio, data,btn_name, character_name, handle):
   if(result==0):
     return 0, "확인 실패"
 
-  result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-  if(result==0):
+  match_list=["chk.png"]
+  match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
+  if(match_result==0 or match_result==2):
     return 0, "이동 체크 실패"
+  time.sleep(2)
+
+  # def checkHunting():
+  #   for i in range(5):
+  #     match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
+  #     if match_result[0]==2:  #템플릿 매칭 예외 발생
+  #       return match_result[0], match_result[1]
+  #     elif match_result[0] in match_list: #매칭 성공 return title, "capture_text 성공", max_val, max_loc
+  #       return match_result[0].replace(".png", ""), ""
+    
+  # result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+  # if(result==0):
+  #   return 0, "이동 체크 실패"
   keyboard('m')
   result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
   if(result==0):
@@ -122,9 +136,11 @@ def dungeon(sio, data, btn_name, character_name, handle):
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
     #이동 완료 체크
-    result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-    if(result==0):
+    match_list=["chk.png"]
+    match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
+    if(match_result==0 or match_result==2):
       return 0, "이동 체크 실패"
+    time.sleep(2)
 
     keyboard('m')
     result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
@@ -160,9 +176,11 @@ def dungeon(sio, data, btn_name, character_name, handle):
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
     #이동 완료 체크
-    result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-    if(result==0):
+    match_list=["chk.png"]
+    match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
+    if(match_result==0 or match_result==2):
       return 0, "이동 체크 실패"
+    time.sleep(2)
 
     keyboard('m')
     result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
@@ -199,9 +217,11 @@ def dungeon(sio, data, btn_name, character_name, handle):
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
     #이동 완료 체크
-    result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-    if(result==0):
+    match_list=["chk.png"]
+    match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
+    if(match_result==0 or match_result==2):
       return 0, "이동 체크 실패"
+    time.sleep(2)
 
     # keyboard('m')
     # result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
@@ -256,9 +276,11 @@ def dungeon(sio, data, btn_name, character_name, handle):
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
     #이동 완료 체크
-    result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-    if(result==0):
+    match_list=["chk.png"]
+    match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
+    if(match_result==0 or match_result==2):
       return 0, "이동 체크 실패"
+    time.sleep(2)
 
     keyboard('m')
     result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
