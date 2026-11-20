@@ -16,9 +16,7 @@ def statusChk(sio, data, btn_name, character_name, handle):
  
   value=check_hunting.checkHunting() #value=성공 시=문자열, 실패 시=0
   if value[0]==0: #0을 return (사냥을 하지 않고 있다는 뜻)
-    result=waking_from_sleep_and_deathChk(btn_name, sleep_time=2, death_routine=1)
-    if result==1: #사망 체크를 수행 했는대 chk.png가 확인 안되서 실패
-      return 0, "페널티 체크 루틴 실패"
+    waking_from_sleep_and_deathChk(sleep_time=2)
     result=normalHunting(sio, data, btn_name, character_name, handle)
     return result
   elif value[0]==2: #capture_text_from_region 예외 발생
@@ -38,7 +36,7 @@ def normalHunting(sio, data,btn_name, character_name, handle):
   if(result==0):
     return 0, "귀환 실패"
 
-  result=img_search_utils.searchImg('autoBuy.png',beforeDelay=0, afterDelay=1, chkCnt=10, _region=(75,845,350,200))
+  result=img_search_utils.searchImg('autoBuy.png',beforeDelay=0, afterDelay=1, chkCnt=20, _region=(75,845,350,200))
   if(result==0):
     return 0, "자동구매 실패"
 
@@ -64,7 +62,7 @@ def normalHunting(sio, data,btn_name, character_name, handle):
   if(result==0):
     return 0, "확인 실패"
 
-  result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(1590,0,330,150))
+  result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
   if(result==0):
     return 0, "이동 체크 실패"
   keyboard('m')
