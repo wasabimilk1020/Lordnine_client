@@ -792,15 +792,9 @@ def morning(sio, data,btn_name, character_name, handle):
   escKey()
   time.sleep(1)
 
-  #아래 상점 루틴인대 space 아두이노에 만들고 하자.
-  # randClick(1580,60,10,10,3)  #상점 클릭
-      
-
-
-
-  # img_search_utils.caputure_image(name, 387,258, sio) #name, x, y, sio
-
-  return 1, "message:None"
+  #모닝루틴 완료 후 사냥터 이동
+  result=normalHunting(sio, data, btn_name, character_name, handle)
+  return result
 
 def seasonpass(sio, data,btn_name, character_name, handle):
   coord=data
@@ -1180,7 +1174,7 @@ def open_box(sio, data,btn_name, character_name, handle):
   for i in range(2):
     randClick(x,y,5,5,0.5) #충전석 상자
     randClick(x,y,5,5,0.5) #더블클릭
-    box_x,box_y=img_search_utils.find_white_stone_center(780, 425, 400, 140)
+    box_x,box_y=img_search_utils.find_hsv_center(780, 425, 400, 140, lower=(0, 0, 180), upper=(179, 50, 255))
     if(box_x==0):
       x+=75
       continue

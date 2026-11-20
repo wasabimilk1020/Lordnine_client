@@ -190,24 +190,20 @@ def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75):
         return title, "capture_text 성공", max_val, max_loc
     return 0, max_val
 
-def find_white_stone_center(x, y, width, height, min_area=300):
-    """
-    return: (cx, cy) or None
-    """
+def find_hsv_center(x, y, width, height, lower, upper, min_area=300):
 
-    # 1. 캡쳐
+    # 1. 캡처
     img = ImageGrab.grab(bbox=(x, y, x+width, y+height))
     img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
-    # 2. HSV
+    # 2. HSV 변환
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    # 3. 흰색 범위 (중요)
-    # 흰색은 H 의미 거의 없고, S 낮고 V 높음
-    lower_white = np.array([0, 0, 180])
-    upper_white = np.array([180, 50, 255])
+    # 3. 전달받은 HSV 범위 적용
+    lower = np.array(lower, dtype=np.uint8)
+    upper = np.array(upper, dtype=np.uint8)
 
-    mask = cv2.inRange(hsv, lower_white, upper_white)
+    mask = cv2.inRange(hsv, lower, upper)
 
     # 4. 노이즈 제거
     kernel = np.ones((3, 3), np.uint8)
@@ -219,18 +215,18 @@ def find_white_stone_center(x, y, width, height, min_area=300):
     )
 
     if not contours:
-        return 0, "박스열기 실패"
+        return None
 
-    # 6. 가장 큰 흰색 덩어리
+    # 6. 가장 큰 색상 영역
     cnt = max(contours, key=cv2.contourArea)
 
     if cv2.contourArea(cnt) < min_area:
-        return 0, "박스열기 실패"
+        return None
 
     # 7. 중심 좌표
     M = cv2.moments(cnt)
     if M["m00"] == 0:
-        return 0, "박스열기 실패"
+        return None
 
     cx = int(M["m10"] / M["m00"]) + x
     cy = int(M["m01"] / M["m00"]) + y
