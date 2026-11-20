@@ -70,14 +70,18 @@ def normalHunting(sio, data,btn_name, character_name, handle):
   if(result==0):
     return 0, "지도 체크 실패"
 
-  randClick(835,690,0,0,1)  #사냥터 클릭
-  escKey()
+  randClick(835,690,3,3,1)  #지도에서 위치 클릭
+  escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
   time.sleep(5)  
   for i in range(50):
     result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
     if(result==0):
       break
-  randClick(1760,720,5,5,1) #공격
+
+  result=img_search_utils.find_hsv_center(1749, 701, 41, 37, lower=(14, 176, 60), upper=(26, 249, 183), min_area=300) #주황색 hsv 공격 중
+  if(result==None):
+    randClick(1760,720,5,5,1) #공격 
+
   img_search_utils.caputure_image(name, 180, 180, sio) #name, x, y, sio
   
   return 1, "message:None"
@@ -101,89 +105,111 @@ def dungeon(sio, data, btn_name, character_name, handle):
   charging=data[4]
   name=character_name
   
-  if btn_name=="격전의섬":
-    for i in range(charging):
-      keyboard("2")
-      time.sleep(2)
-
-    keyboard("`") #던전
-    result=img_search_utils.searchImg('favorite.png', beforeDelay=1, afterDelay=1,  _region=(700, 230, 800, 120))  #즐겨찾기 클릭
-
-    result=img_search_utils.searchImg('dungeonG.png',beforeDelay=1, afterDelay=1)
-    if(result==0):
-      return 0, "격전의 섬 클릭 실패"
-
-    result=img_search_utils.searchImg('dungeon_enter.png', beforeDelay=0, afterDelay=1, _region=(1200, 750, 400, 150))  #입장하기 
-    if(result==0):
-      return 0, "격섬 입장 클릭 실패"
-    randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭
-
-    #이동 완료 체크
-    result=img_search_utils.searchImg('chk.png', beforeDelay=1, afterDelay=2.5, justChk=True, chkCnt=10,_region=(910,180,230,70))
-    if(result==0):
-      return 0, f"{btn_name} 이동 실패"
-
-    keyboard('6') #순간이동
-
-  elif btn_name=="파괴된성채":
-    for i in range(charging):
-      keyboard("1")
-      time.sleep(2)
-
-    keyboard("`") #던전
-    result=img_search_utils.searchImg('favorite.png', beforeDelay=1, afterDelay=1,  _region=(700, 230, 800, 120))  #즐겨찾기 클릭
-
-    result=img_search_utils.searchImg('dungeonD.png',beforeDelay=0, afterDelay=1, chkCnt=10)
-    if(result==0):
-      print("파괴된 성채 실패")
-      return 0, "파괴된성채 클릭 실패"
-
-    result=img_search_utils.searchImg('dungeon_enter.png', beforeDelay=0, afterDelay=1, chkCnt=10, _region=(1200, 750, 400, 150))  #입장하기 
-    if(result==0):
-      return 0, "파괴성 입장 클릭 실패"
-    randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭
-
-    #이동 완료 체크
-    result=img_search_utils.searchImg('chk.png', beforeDelay=1, afterDelay=2.5, justChk=True, chkCnt=10,_region=(910,180,230,70))
-    if(result==0):
-      return 0, f"{btn_name} 이동 실패"
-  
-    keyboard('6') #순간이동
-
-  elif btn_name=="크루마탑":
+  if btn_name=="어둠의숲":
+    keyboard('`') #던전
     # for i in range(charging):
     #   keyboard("1")
     #   time.sleep(2)
-    keyboard("`") #던전
-    result=img_search_utils.searchImg('favorite.png', beforeDelay=1, afterDelay=1,  _region=(700, 230, 800, 120))  #즐겨찾기 클릭
 
-    result=img_search_utils.searchImg('cruma.png',beforeDelay=0, afterDelay=1, chkCnt=10)
+    result=img_search_utils.searchImg('darkDun.png', beforeDelay=1, afterDelay=0, _region=(122, 481, 289, 251))
     if(result==0):
-      return 0, "크루마탑 클릭 실패"
+      return 0, "파괴된성채 클릭 실패"
+    
+    randClick(1465,975,10,10,5) #입장
 
-    result=img_search_utils.searchImg('dungeon_enter.png', beforeDelay=0, afterDelay=1, _region=(1200, 750, 400, 150))  #입장하기
+    # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
+    #이동 완료 체크
+    result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
     if(result==0):
-      return 0, "크루마 입장 클릭 실패"
-    randClick(coord[0],coord[1],coord[2],coord[3],1)  #층 클릭 
+      return 0, "이동 체크 실패"
 
-  elif btn_name=="안타라스":
-    print(f"{btn_name} 실행") #임시
+    keyboard('m')
+    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+    if(result==0):
+      return 0, "지도 체크 실패"
+
+    randClick(960,700,3,3,1)  #지도에서 위치 클릭
+    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    time.sleep(5)  
+    for i in range(50):
+      result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
+      if(result==0):
+        break
   
+    result=img_search_utils.find_hsv_center(1749, 701, 41, 37, lower=(14, 176, 60), upper=(26, 249, 183), min_area=300) #주황색 hsv 공격 중
+    if(result==None):
+      randClick(1760,720,5,5,1) #공격 
+
+  elif btn_name=="타락한미궁":
+    keyboard('`') #던전
     # for i in range(charging):
-    #     keyboard("1")
-    #     time.sleep(2)
+    #   keyboard("1")
+    #   time.sleep(2)
 
-    # keyboard("`") #던전
-    # result=client_utils.searchImg('favorite.png', beforeDelay=1, afterDelay=1,  _region=(700, 230, 800, 120))  #즐겨찾기 클릭
+    result=img_search_utils.searchImg('destroyDun.png', beforeDelay=1, afterDelay=0, _region=(114, 683, 347, 253))
+    if(result==0):
+      return 0, "파괴된성채 클릭 실패"
+    
+    randClick(1465,975,10,10,5) #입장
 
-    # result=client_utils.searchImg('antaras.png',beforeDelay=1, afterDelay=1)
+    # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
+    #이동 완료 체크
+    result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+    if(result==0):
+      return 0, "이동 체크 실패"
+
+    keyboard('m')
+    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+    if(result==0):
+      return 0, "지도 체크 실패"
+
+    randClick(900,490,3,3,1)  #지도에서 위치 클릭
+    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    time.sleep(5)  
+    for i in range(50):
+      result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
+      if(result==0):
+        break
+  
+    result=img_search_utils.find_hsv_center(1749, 701, 41, 37, lower=(14, 176, 60), upper=(26, 249, 183), min_area=300) #주황색 hsv 공격 중
+    if(result==None):
+      randClick(1760,720,5,5,1) #공격 
+
+  elif btn_name=="수련의전당":
+    keyboard('`') #던전
+    # for i in range(charging):
+    #   keyboard("1")
+    #   time.sleep(2)
+
+    #여기 마우스 드래그로 아래로 내려주는 것 필요함
+    result=img_search_utils.searchImg('trainDun.png', beforeDelay=1, afterDelay=0, _region=(85, 714, 359, 257))
+    if(result==0):
+      return 0, "파괴된성채 클릭 실패"
+    
+    randClick(1465,975,10,10,5) #입장
+
+    # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
+    #이동 완료 체크
+    result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+    if(result==0):
+      return 0, "이동 체크 실패"
+
+    # keyboard('m')
+    # result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
     # if(result==0):
-    #   return 0, "안타라스 클릭 실패"
+    #   return 0, "지도 체크 실패"
 
-    # result=client_utils.searchImg('dungeon_enter.png', beforeDelay=0, afterDelay=0, _region=(1200, 750, 400, 150))  #입장하기
-    # if(result==0):
-    #   return 0, "안타 입장 클릭 실패"
-    # # randClick(coord[0],coord[1],coord[2],coord[3],1)  #층 클릭 (설정 해줘야함 json에서)
+    # randClick(960,700,3,3,1)  #지도에서 위치 클릭
+    # escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    # time.sleep(5)  
+    # for i in range(50):
+    #   result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
+    #   if(result==0):
+    #     break
+  
+    # result=img_search_utils.find_hsv_center(1749, 701, 41, 37, lower=(14, 176, 60), upper=(26, 249, 183), min_area=300) #주황색 hsv 공격 중
+    # if(result==None):
+    #   randClick(1760,720,5,5,1) #공격 
 
   elif btn_name=="상아탑":
     for i in range(charging):
@@ -207,92 +233,40 @@ def dungeon(sio, data, btn_name, character_name, handle):
       
     result_3=img_search_utils.searchImg('clk_schedule_start.png',beforeDelay=0, afterDelay=0, _region=(1260,790,300,100))
 
-  if btn_name=="여명의사원":
-    for i in range(charging):
-      keyboard("2")
-      time.sleep(2)
-
-    keyboard("`") #던전
-    # result=client_utils.searchImg('favorite.png', beforeDelay=1, afterDelay=1,  _region=(700, 230, 800, 120))  #즐겨찾기 클릭
-    dragValues={'fromStartX':680, 'toStartX':980,'fromStartY':650,'toStartY':750,'fromEndX':680, 'toEndX':980,'fromEndY':120,'toEndY':160}
-    serial_comm.mouseDrag(dragValues)
-    time.sleep(2)
-    
-    result=img_search_utils.searchImg('yomyoung.png',beforeDelay=1, afterDelay=1)
-    if(result==0):
-      return 0, "여명의사원 클릭 실패"
-
-    result=img_search_utils.searchImg('dungeon_enter.png', beforeDelay=0, afterDelay=1, _region=(1200, 750, 400, 150))  #입장하기
-    if(result==0):
-      return 0, "여명의사원 입장 클릭 실패"
-    randClick(coord[0],coord[1],coord[2],coord[3],3)  
-
-    #이동 완료 체크
-    result=img_search_utils.searchImg('chk.png', beforeDelay=1, afterDelay=2.5, justChk=True, chkCnt=10,_region=(910,180,230,70))
-    if(result==0):
-      return 0, f"{btn_name} 이동 실패"
-
-    keyboard('6') #순간이동
-
-  elif btn_name=="운디네사원":
+  elif btn_name=="이벤트던전":
+    keyboard('`') #던전
     # for i in range(charging):
-    #   keyboard("2")
+    #   keyboard("1")
     #   time.sleep(2)
 
-    # keyboard("`") #던전
-    # # result=utils.searchImg('favorite.png', beforeDelay=1, afterDelay=1,  _region=(700, 230, 800, 120))  #즐겨찾기 클릭
-
-    # result=img_search_utils.searchImg('undine.png',beforeDelay=1, afterDelay=1)
-    # if(result==0):
-    #   return 0, "운디네사원 클릭 실패"
-
-    # result=img_search_utils.searchImg('dungeon_enter.png', beforeDelay=0, afterDelay=1, _region=(1200, 750, 400, 150))  #입장하기 
-    # if(result==0):
-    #   return 0, "운디네사원 입장 클릭 실패"
-    # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭
-
-    # #이동 완료 체크
-    # result=img_search_utils.searchImg('chk.png', beforeDelay=1, afterDelay=2.5, justChk=True, chkCnt=10,_region=(910,180,230,70))
-    # if(result==0):
-    #   return 0, f"{btn_name} 이동 실패"
-  
-    # keyboard('6') #순간이동
-    keyboard("`") #던전
-        
-    result=img_search_utils.searchImg('eventDun_2.png',beforeDelay=0.5, afterDelay=0)
+    result=img_search_utils.searchImg('eventDun.png',beforeDelay=1, afterDelay=0, _region=(125, 88, 314, 271))
     if(result==0):
-      return 0, "이벤트던전 클릭 실패"
-
-    result=img_search_utils.searchImg('dungeon_enter.png', beforeDelay=0, afterDelay=1, _region=(1200, 750, 400, 150))  #입장하기 
-    if(result==0):
-      return 0, "이벤트 입장 클릭 실패"
-    # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭
-    randClick(1045,655,10,10,0) #클릭 확인
-
-  elif btn_name=="이벤트던전":
-    print(f"{btn_name} 실행") #임시
-
-    keyboard("`") #던전
+      return 0, "파괴된성채 클릭 실패"
     
-    result=img_search_utils.searchImg('eventDun.png',beforeDelay=0.5, afterDelay=0)
+    randClick(1465,975,10,10,5) #입장
+
+    # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
+    #이동 완료 체크
+    result=img_search_utils.searchImg('chk.png', beforeDelay=0, afterDelay=2, justChk=True, _region=(1590,0,330,150))
     if(result==0):
-      return 0, "이벤트던전 클릭 실패"
+      return 0, "이동 체크 실패"
 
-    result=img_search_utils.searchImg('dungeon_enter.png', beforeDelay=0, afterDelay=1, _region=(1200, 750, 400, 150))  #입장하기 
+    keyboard('m')
+    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
     if(result==0):
-      return 0, "이벤트 입장 클릭 실패"
-    # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭
-    randClick(1045,655,10,10,0) #클릭 확인
+      return 0, "지도 체크 실패"
 
-
-    # #이동 완료 체크
-    # result=img_search_utils.searchImg('chk.png', beforeDelay=1, afterDelay=2.5, justChk=True, chkCnt=10,_region=(910,180,230,70))
-    # if(result==0):
-    #   return 0, f"{btn_name} 이동 실패"
+    randClick(940,610,3,3,1)  #지도에서 위치 클릭
+    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    time.sleep(5)  
+    for i in range(50):
+      result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
+      if(result==0):
+        break
   
-    # keyboard('6') #순간이동
-    
-    # return 4, "message:None"  #절전모드로 진입하지 않고 진행 
+    result=img_search_utils.find_hsv_center(1749, 701, 41, 37, lower=(14, 176, 60), upper=(26, 249, 183), min_area=300) #주황색 hsv 공격 중
+    if(result==None):
+      randClick(1760,720,5,5,1) #공격 
   
 
   img_search_utils.caputure_image(name, 387, 258, sio) #name, x, y, sio

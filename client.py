@@ -91,9 +91,9 @@ def reqAccount(data):
 button_mapping={
   "status_check_button":button_func.statusChk,  
   "사냥":button_func.normalHunting,
-  "격전의섬":button_func.dungeon,
-  "파괴된성채":button_func.dungeon,
-  "크루마탑":button_func.dungeon,
+  "어둠의숲":button_func.dungeon,
+  "타락한미궁":button_func.dungeon,
+  "수련의전당":button_func.dungeon,
   "안타라스":button_func.dungeon,
   "상아탑":button_func.dungeon,
   "여명의사원":button_func.dungeon,

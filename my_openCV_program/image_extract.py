@@ -120,7 +120,7 @@ def select_image_region():
     )
 
     # image_files 폴더에 저장
-    output_dir = Path(__file__).resolve().parent / "image_files"
+    output_dir = Path(__file__).resolve().parent.parent / "image_files"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     filename = f"template_{datetime.now():%Y%m%d_%H%M%S}.png"
