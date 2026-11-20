@@ -122,9 +122,9 @@ def dungeon(sio, data, btn_name, character_name, handle):
 
     result=img_search_utils.searchImg('darkDun.png', beforeDelay=1, afterDelay=0, _region=(122, 481, 289, 251))
     if(result==0):
-      return 0, "파괴된성채 클릭 실패"
+      return 0, "어둠의숲 클릭 실패"
     
-    randClick(1465,975,10,10,5) #입장
+    randClick(1465,975,10,10,7) #입장
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
     #이동 완료 체크
@@ -168,7 +168,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
     if(result==0):
       return 0, "파괴된성채 클릭 실패"
     
-    randClick(1465,975,10,10,5) #입장
+    randClick(1465,975,10,10,7) #입장
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
     #이동 완료 체크
@@ -213,7 +213,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
     if(result==0):
       return 0, "파괴된성채 클릭 실패"
     
-    randClick(1465,975,10,10,5) #입장
+    randClick(1465,975,10,10,7) #입장
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
     #이동 완료 체크
@@ -272,7 +272,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
     if(result==0):
       return 0, "파괴된성채 클릭 실패"
     
-    randClick(1465,975,10,10,5) #입장
+    randClick(1465,975,10,10,7) #입장
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
     #이동 완료 체크
@@ -307,7 +307,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
       randClick(1760,720,5,5,1) #공격 
   
 
-  img_search_utils.caputure_image(name, 387, 258, sio) #name, x, y, sio
+  img_search_utils.caputure_image(name, 180, 170, sio) #name, x, y, sio
 
   return 1, "message:None"
 
