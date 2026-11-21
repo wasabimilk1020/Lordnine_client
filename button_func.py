@@ -445,6 +445,8 @@ def decomposeItem(sio, data,btn_name, character_name, handle):
   name=character_name
 
   keyboard("=") #인벤토리
+  time.sleep(1)
+  randClick(930,155,10,10,0)  #아이템 분해 클릭 (화면에 글씨 표시 되는 부분이라 이미서치 안함)
 
   success, _ =img_search_utils.searchImg('item_auto_registration.png', beforeDelay=2, afterDelay=2, _region=(1290,805,300,150))
   if not success:
@@ -453,7 +455,7 @@ def decomposeItem(sio, data,btn_name, character_name, handle):
   spaceKey()
   time.sleep(2)
   spaceKey()
-  time.sleep(4)
+  time.sleep(2)
   img_search_utils.caputure_image(name, 459, 285, sio) #name, x, y, sio
   escKey()
   time.sleep(1)
