@@ -453,9 +453,9 @@ def decomposeItem(sio, data,btn_name, character_name, handle):
     return False, {"message":"분해 실패"}
   
   spaceKey()
-  time.sleep(2)
+  time.sleep(3)
   spaceKey()
-  time.sleep(2)
+  time.sleep(3)
   img_search_utils.caputure_image(name, 459, 285, sio) #name, x, y, sio
   escKey()
   time.sleep(1)
