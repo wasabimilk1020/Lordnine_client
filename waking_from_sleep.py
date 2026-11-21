@@ -3,7 +3,7 @@ import serial_comm
 import time
 
 def waking_from_sleep_and_deathChk(sleep_time):
-  result=img_search_utils.searchImg('death.png', beforeDelay=0, afterDelay=0, chkCnt=2, _region=(770, 675, 400,200))
+  result, _ =img_search_utils.searchImg('death.png', beforeDelay=0, afterDelay=0, chkCnt=2, _region=(770, 675, 400,200))
 
   #절전모드 해제 
   serial_comm.keyboard('g')

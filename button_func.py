@@ -9,129 +9,153 @@ import win32gui
 import win32con
 
 def start_attack():
-    orange_result = img_search_utils.find_hsv_center(
+    is_orange, _ = img_search_utils.find_hsv_center(
         1749, 701, 41, 37,
         lower=(14, 176, 60),
         upper=(26, 249, 183),
         min_area=300
     )
 
-    gray_result = img_search_utils.find_hsv_center(
+    is_gray, _ = img_search_utils.find_hsv_center(
         1753, 692, 56, 59,
         lower=(0, 0, 0),
         upper=(179, 79, 61),
         min_area=300
     )
 
-    is_orange = orange_result is not None
-    is_gray = gray_result is not None
-
     if is_orange and not is_gray:
-        return 1, "이미 공격 중"
+        return True, "이미 공격 중"
 
     elif not is_orange and is_gray:
         randClick(1760, 720, 5, 5, 1)
-        return 1, "공격 버튼 클릭 완료"
+        return True, "공격 버튼 클릭 완료"
 
     elif not is_orange and not is_gray:
-        return 0, "공격 버튼 상태 확인 실패"
+        return False, "공격 버튼 상태 확인 실패"
 
     else:
-        return 0, "공격 버튼 상태 충돌"
+        return False, "공격 버튼 상태 충돌"
+
+
 
 def move_on_map(x, y, width=3, height=3, delay=1):
-    # ===== 지도 열기 =====
+  # ===== 지도 열기 (최대 2번 시도) =====
+  for attempt in range(2):
     keyboard('m')
 
-    result = img_search_utils.searchImg(
-        'map_chk_1.png',
-        beforeDelay=2, afterDelay=2,
-        justChk=True, _region=(1590, 0, 330, 150)
+    # 지도 UI 확인 1
+    map_success, _ = img_search_utils.searchImg(
+      'map_chk_1.png',
+      beforeDelay=2, afterDelay=2,
+      justChk=True, _region=(1590, 0, 330, 150)
     )
 
-    if result == 0:
-      result = img_search_utils.searchImg(
+    # 첫 번째 이미지가 없을 때만 두 번째 확인
+    if not map_success:
+      map_success, _ = img_search_utils.searchImg(
         'map_chk_2.png',
         beforeDelay=1, afterDelay=1,
         justChk=True, _region=(1547, 6, 251, 232)
       )
 
-      if result == 0:
-        return 0, "지도 열기 확인 실패"
+    # 지도 열림 확인
+    if map_success:
+      break
 
-    # ===== 지도에서 위치 클릭 =====
-    randClick(x, y, width, height, delay)
+    # 두 이미지 모두 미검출 → 기본 화면 확인
+    normal_success, _ = img_search_utils.searchImg(
+      'map_chk_3.png',
+      beforeDelay=0, afterDelay=0,
+      justChk=True, _region=(1510, 592, 260, 257)
+    )
 
-    # ===== 지도 닫기 =====
-    escKey()
+    # 기본 화면도 확인되지 않으면 상태 불명
+    if not normal_success:
+      return False, "지도 열기 상태 확인 실패"
 
-    # 최대 2번 닫힘 상태 확인
-    for attempt in range(2):
+    # 기본 화면 확인됐지만 재시도까지 실패
+    if attempt == 1:
+      return False, "지도 열기 실패"
 
-        # 지도 UI 확인
-        map_result = img_search_utils.searchImg(
-            'map_chk_1.png',
-            beforeDelay=2 if attempt == 0 else 1,
-            afterDelay=0,
-            justChk=True,
-            _region=(1590, 0, 330, 150)
-        )
+  # ===== 지도에서 위치 클릭 =====
+  randClick(x, y, width, height, delay)
 
-        # 기본 화면 UI 확인
-        normal_result = img_search_utils.searchImg(
-            'map_chk_3.png',
-            beforeDelay=0, afterDelay=0,
-            justChk=True,
-            _region=(1510, 592, 260, 257)
-        )
+  # ===== 지도 닫기 =====
+  escKey()
 
-        # 지도 닫힘 + 기본 화면 확인
-        if map_result == 0 and normal_result != 0:
-            return 1, "지도 조작 루틴 완료"
+  # 최대 2번 닫힘 상태 확인
+  for attempt in range(2):
 
-        # 지도만 검출됨 → ESC 재시도
-        if map_result != 0 and normal_result == 0:
-            if attempt == 0:
-                escKey()
-                continue
+    # 지도 UI 확인 1
+    map_success, _ = img_search_utils.searchImg(
+      'map_chk_1.png',
+      beforeDelay=2 if attempt == 0 else 1,
+      afterDelay=0,
+      justChk=True, _region=(1590, 0, 330, 150)
+    )
 
-            return 0, "지도 닫기 실패"
+    # 첫 번째 이미지가 없을 때만 두 번째 확인
+    if not map_success:
+      map_success, _ = img_search_utils.searchImg(
+        'map_chk_2.png',
+        beforeDelay=0, afterDelay=0,
+        justChk=True, _region=(1547, 6, 251, 232)
+      )
 
-        # 두 UI 모두 검출되거나 둘 다 미검출
-        return 0, "지도 상태 확인 실패"
+    # 지도가 여전히 열려 있으면 ESC 재시도
+    if map_success:
+      if attempt == 0:
+        escKey()
+        continue
 
-    return 0, "지도 닫기 실패"
+      return False, "지도 닫기 실패"
 
-#data=[1142, 375, 10, 10, 0.0]=[x,y,xRange,yRange,delay]
+    # 지도 이미지 모두 미검출 → 기본 화면 확인
+    # normal_success라는게 지도에서 나와 일반 ui에서 이미지 체크를 수행하는 것을 뜻함
+    normal_success, _ = img_search_utils.searchImg(
+      'map_chk_3.png',
+      beforeDelay=0, afterDelay=0,
+      justChk=True, _region=(1510, 592, 260, 257)
+    )
+
+    if normal_success:
+      return True, "지도 조작 루틴 완료"
+
+    return False, "지도 상태 확인 실패"
+
+  return False, "지도 닫기 실패"
+
+
+# data=[1142, 375, 10, 10, 0.0]=[x,y,xRange,yRange,delay]
 def statusChk(sio, data, btn_name, character_name, handle):
-  coord=data
-  delay=data[4]
-  name=character_name
- 
-  value=check_hunting.checkHunting() #value=성공 시=문자열, 실패 시=0
-  if value[0]==0: #0을 return (사냥을 하지 않고 있다는 뜻)
-    waking_from_sleep_and_deathChk(sleep_time=2)
-    result=normalHunting(sio, data, btn_name, character_name, handle)
-    return result
-  elif value[0]==2: #capture_text_from_region 예외 발생
-    return 1, value[1]
-  else:  #성공 
-    text=value[0]
-    return 2, text  #다른 일반 버튼 루틴과 다르게 처리하기 위해서statusChk완료를 2를 리턴함으로서 알림.
+  coord = data
+  delay = data[4]
+  name = character_name
 
-def normalHunting(sio, data,btn_name, character_name, handle):
+  success, hunting_status = check_hunting.checkHunting()
+
+  if not success:  # 사냥 중이 아님
+    waking_from_sleep_and_deathChk(sleep_time=2)
+    result = normalHunting(sio, data, btn_name, character_name, handle)
+    return result
+
+  else:  # 사냥 중
+    return 2, hunting_status
+
+
+def normalHunting(sio, data, btn_name, character_name, handle):
   coord=data
   flag=data[4]
   name=character_name
 
   keyboard('b') #귀환
 
-  result=img_search_utils.searchImg('storeBuy.png',beforeDelay=5, afterDelay=5, _region=(1500,660,420,300))
-  if(result==0):
+  success, _ = img_search_utils.searchImg('storeBuy.png', beforeDelay=5, afterDelay=5, _region=(1500,660,420,300))
+  if not success:
     return 0, "귀환 실패"
 
-  result=img_search_utils.searchImg('autoBuy.png',beforeDelay=0, afterDelay=1, chkCnt=20, _region=(75,845,350,200))
-  if(result==0):
+  success, _ = img_search_utils.searchImg('autoBuy.png', beforeDelay=0, afterDelay=1, chkCnt=20, _region=(75,845,350,200))
+  if not success:
     return 0, "자동구매 실패"
 
   randClick(1045,800,10,10,1) #확인
@@ -139,26 +163,26 @@ def normalHunting(sio, data,btn_name, character_name, handle):
   time.sleep(2)
   keyboard('m') #지도
 
-  result=img_search_utils.searchImg('favorite.png', beforeDelay=2, afterDelay=1, _region=(0,820,100,150))
-  if(result==0):
+  success, _ = img_search_utils.searchImg('favorite.png', beforeDelay=2, afterDelay=1, _region=(0,820,100,150))
+  if not success:
     return 0, "즐겨찾기 실패"
 
-  result=img_search_utils.searchImg('hunting_place.png', beforeDelay=0, afterDelay=2, _region=(70,220,250,400))
-  if(result==0):
+  success, _ = img_search_utils.searchImg('hunting_place.png', beforeDelay=0, afterDelay=2, _region=(70,220,250,400))
+  if not success:
     return 0, "사냥터 클릭 실패"
 
-  result=img_search_utils.searchImg('hunting_portal.png', beforeDelay=0, afterDelay=1, _region=(1490,155,400,800))
-  if(result==0):
+  success, _ = img_search_utils.searchImg('hunting_portal.png', beforeDelay=0, afterDelay=1, _region=(1490,155,400,800))
+  if not success:
     return 0, "포탈 클릭 실패"
 
   randClick(1735,990,10,10,1) #빠른이동
-  result=img_search_utils.searchImg('confirm.png', beforeDelay=0, afterDelay=7, _region=(985,575,300,200))
-  if(result==0):
+  success, _ = img_search_utils.searchImg('confirm.png', beforeDelay=0, afterDelay=7, _region=(985,575,300,200))
+  if not success:
     return 0, "확인 실패"
 
   match_list=["chk.png"]
-  match_result=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
-  if(match_result[0]==0 or match_result[0]==2):
+  success, match_data=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
+  if success==0:
     return 0, "이동 체크 실패"
   time.sleep(2)
 
@@ -166,20 +190,21 @@ def normalHunting(sio, data,btn_name, character_name, handle):
   result, message = move_on_map(835, 690, 3, 3, 1)
   if result == 0:
     return 0, message
-  
+
   for i in range(50):
-    result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
-    if(result==0):
+    success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
+    if not success:
       break
 
   #공격
   result, message = start_attack()
   if result == 0:
     return 0, message
-  
+
   img_search_utils.caputure_image(name, 180, 180, sio) #name, x, y, sio
-  
+
   return 1, "message:None"
+
 
 def postBox(sio, data,btn_name, character_name, handle):
   keyboard(',')
@@ -194,22 +219,23 @@ def postBox(sio, data,btn_name, character_name, handle):
   
   return 1, "message:None"
 
+
 #---------던전---------#
 def dungeon(sio, data, btn_name, character_name, handle):
   coord=data
   charging=data[4]
   name=character_name
-  
+
   if btn_name=="어둠의숲":
     keyboard('`') #던전
     # for i in range(charging):
     #   keyboard("1")
     #   time.sleep(2)
 
-    result=img_search_utils.searchImg('darkDun.png', beforeDelay=1, afterDelay=1, _region=(122, 481, 289, 251))
-    if(result==0):
+    success, _ = img_search_utils.searchImg('darkDun.png', beforeDelay=1, afterDelay=1, _region=(122, 481, 289, 251))
+    if not success:
       return 0, "어둠의숲 클릭 실패"
-    
+
     randClick(1465,975,10,10,7) #입장
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
@@ -221,23 +247,23 @@ def dungeon(sio, data, btn_name, character_name, handle):
     time.sleep(2)
 
     keyboard('m')
-    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-    if(result==0):
+    success, _ = img_search_utils.searchImg('map_chk_1.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+    if not success:
       keyboard('m')
-      result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-      if(result==0):
+      success, _ = img_search_utils.searchImg('map_chk_1.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+      if not success:
         return 0, "지도 체크 실패"
-  
+
     randClick(960,700,3,3,1)  #지도에서 위치 클릭
-    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네 
-    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
-    if(result==1):
+    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    success, _ = img_search_utils.searchImg('map_chk_1.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
+    if success:
       escKey()
-    time.sleep(5) 
-  
+    time.sleep(5)
+
     for i in range(50):
-      result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
-      if(result==0):
+      success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
+      if not success:
         break
 
     #공격
@@ -251,10 +277,10 @@ def dungeon(sio, data, btn_name, character_name, handle):
     #   keyboard("1")
     #   time.sleep(2)
 
-    result=img_search_utils.searchImg('destroyDun.png', beforeDelay=1, afterDelay=1, _region=(114, 683, 347, 253))
-    if(result==0):
-      return 0, "파괴된성채 클릭 실패"
-    
+    success, _ = img_search_utils.searchImg('destroyDun.png', beforeDelay=1, afterDelay=1, _region=(114, 683, 347, 253))
+    if not success:
+      return 0, "타락한미궁 클릭 실패"
+
     randClick(1465,975,10,10,7) #입장
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
@@ -266,23 +292,23 @@ def dungeon(sio, data, btn_name, character_name, handle):
     time.sleep(2)
 
     keyboard('m')
-    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-    if(result==0):
+    success, _ = img_search_utils.searchImg('map_chk_1.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+    if not success:
       keyboard('m')
-      result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-      if(result==0):
+      success, _ = img_search_utils.searchImg('map_chk_1.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+      if not success:
         return 0, "지도 체크 실패"
-  
+
     randClick(900,490,3,3,1)  #지도에서 위치 클릭
-    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네 
-    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
-    if(result==1):
+    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    success, _ = img_search_utils.searchImg('map_chk_1.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
+    if success:
       escKey()
-    time.sleep(5) 
-    
+    time.sleep(5)
+
     for i in range(50):
-      result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
-      if(result==0):
+      success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
+      if not success:
         break
 
     #공격
@@ -297,10 +323,10 @@ def dungeon(sio, data, btn_name, character_name, handle):
     #   time.sleep(2)
 
     #여기 마우스 드래그로 아래로 내려주는 것 필요함
-    result=img_search_utils.searchImg('trainDun.png', beforeDelay=1, afterDelay=1, _region=(85, 714, 359, 257))
-    if(result==0):
-      return 0, "파괴된성채 클릭 실패"
-    
+    success, _ = img_search_utils.searchImg('trainDun.png', beforeDelay=1, afterDelay=1, _region=(85, 714, 359, 257))
+    if not success:
+      return 0, "수련의전당 클릭 실패"
+
     randClick(1465,975,10,10,7) #입장
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
@@ -318,15 +344,15 @@ def dungeon(sio, data, btn_name, character_name, handle):
 
     # randClick(960,700,3,3,1)  #지도에서 위치 클릭
     # escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
-    # time.sleep(5)  
+    # time.sleep(5)
     # for i in range(50):
     #   result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
     #   if(result==0):
     #     break
-  
+
     # result=img_search_utils.find_hsv_center(1749, 701, 41, 37, lower=(14, 176, 60), upper=(26, 249, 183), min_area=300) #주황색 hsv 공격 중
     # if(result==None):
-    #   randClick(1760,720,5,5,1) #공격 
+    #   randClick(1760,720,5,5,1) #공격
 
   elif btn_name=="상아탑":
     for i in range(charging):
@@ -340,14 +366,14 @@ def dungeon(sio, data, btn_name, character_name, handle):
     result=img_search_utils.searchImg('sanga.png',beforeDelay=0.5, afterDelay=0.5, _region=(480, 455, 400, 300))
     if(result==0):
       return 0, "상아탑 클릭 실패"
-    
+
     randClick(coord[0],coord[1],coord[2],coord[3],1)  #층 클릭 (설정 해줘야함 json에서)
-    
+
     result_coord=img_search_utils.searchImg('plus.png',beforeDelay=0, afterDelay=0, justChk=True, _region=(1450,340,200,100)) #시간충전 좌표
- 
+
     for i in range(7):
       randClick(result_coord[0],result_coord[1],0,0,0.3) #시간 충전
-      
+
     result_3=img_search_utils.searchImg('clk_schedule_start.png',beforeDelay=0, afterDelay=0, _region=(1260,790,300,100))
 
   elif btn_name=="이벤트던전":
@@ -356,10 +382,10 @@ def dungeon(sio, data, btn_name, character_name, handle):
     #   keyboard("1")
     #   time.sleep(2)
 
-    result=img_search_utils.searchImg('eventDun.png',beforeDelay=1, afterDelay=1, _region=(125, 88, 314, 271))
-    if(result==0):
-      return 0, "파괴된성채 클릭 실패"
-    
+    success, _ = img_search_utils.searchImg('eventDun.png', beforeDelay=1, afterDelay=1, _region=(125, 88, 314, 271))
+    if not success:
+      return 0, "이벤트던전 클릭 실패"
+
     randClick(1465,975,10,10,7) #입장
 
     # randClick(coord[0],coord[1],coord[2],coord[3],3)  #층 클릭 (현재는 층이 선택되어 있어 필요 없지만 혹시 몰라 남김)
@@ -371,34 +397,34 @@ def dungeon(sio, data, btn_name, character_name, handle):
     time.sleep(2)
 
     keyboard('m')
-    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-    if(result==0):
+    success, _ = img_search_utils.searchImg('map_chk_1.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+    if not success:
       keyboard('m')
-      result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
-      if(result==0):
+      success, _ = img_search_utils.searchImg('map_chk_1.png', beforeDelay=2, afterDelay=2, justChk=True, _region=(1590,0,330,150))
+      if not success:
         return 0, "지도 체크 실패"
-  
+
     randClick(940,610,3,3,1)  #지도에서 위치 클릭
-    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네 
-    result=img_search_utils.searchImg('map_chk.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
-    if(result==1):
+    escKey()  #여기서 가끔 esc가 안눌러지는지 씹히는 경우가 있네
+    success, _ = img_search_utils.searchImg('map_chk_1.png', beforeDelay=2, afterDelay=0, justChk=True, _region=(1590,0,330,150)) #지도 체크 한번 더
+    if success:
       escKey()
-    time.sleep(5) 
-    
+    time.sleep(5)
+
     for i in range(50):
-      result=img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
-      if(result==0):
+      success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
+      if not success:
         break
 
     #공격
     result, message = start_attack()
     if result == 0:
       return 0, message
-  
 
   img_search_utils.caputure_image(name, 180, 170, sio) #name, x, y, sio
 
   return 1, "message:None"
+
 
 #---------아이템 변경---------#
 def switch_get_item(sio, data, btn_name, character_name, handle):

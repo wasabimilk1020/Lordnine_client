@@ -14,18 +14,22 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 from PIL import ImageGrab,ImageEnhance,Image,ImageOps,ImageFilter
 import cv2
 import numpy as np 
+from typing import Tuple, Optional
 
-#이미지 서치
+
+# 이미지 서치
 def searchImg(imgTitle, beforeDelay, afterDelay, justChk=False, coord=[], chkCnt=5, _region=(300, 125, 1370, 790), accuracy=0.85):
-  full_path=utils.file_path(f"{imgTitle}","image_files")  #file, folder, sub_folder
-  chkInterval=0.5
+  full_path = utils.file_path(f"{imgTitle}", "image_files")
+  chkInterval = 0.5
   loopCnt = 0
 
   while loopCnt < chkCnt:
     loopCnt += 1
     try:
       time.sleep(beforeDelay)
-      result = pyautogui.locateOnScreen(full_path, region=_region, confidence=accuracy)
+      result = pyautogui.locateOnScreen(
+        full_path, region=_region, confidence=accuracy
+      )
 
       if result is None:  # 이미지 찾기 실패
         time.sleep(chkInterval)
@@ -36,20 +40,23 @@ def searchImg(imgTitle, beforeDelay, afterDelay, justChk=False, coord=[], chkCnt
         randClick(coord[0], coord[1], coord[2], coord[3], 0)
       elif justChk:  # 클릭 없이 이미지 체크만 할 경우
         time.sleep(afterDelay)
-        return result
+        return True, result
       else:  # 이미지 클릭
         randClick(result[0], result[1], result[2], result[3], 0)
-      
+
       time.sleep(afterDelay)
-      return 1
-    except pyautogui.ImageNotFoundException:  #이미지 찾기 실패
+      return True, result
+
+    except pyautogui.ImageNotFoundException:
       print(f"Image '{imgTitle}' not found on screen.")
       time.sleep(chkInterval)
       continue
+
     except Exception as e:
-      print(f"An error occurred: {e}")
-      return 0 
-  return 0  
+      raise RuntimeError(f"이미지 검색 오류 ({imgTitle}): {e}") from e
+
+  return False, None
+  
 
 def caputure_image(name,x,y,sio):
   full_path=utils.file_path(f"{name}.png","image_files","capture_img")  #file, folder, sub_folder
@@ -141,53 +148,53 @@ def preprocess_image(temp_imgTitle, output_path):  #이미지 전처리
   # 저장
   cv2.imwrite(output_path, sharpened)
 
+
 def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75, chk_cnt=5):
 
-    bbox = (x, y, x + width, y + height)
+  bbox = (x, y, x + width, y + height)
 
-    for cnt in range(chk_cnt):
-        # 화면 캡처
-        target_pil = ImageGrab.grab(bbox)
-        img = cv2.cvtColor(np.array(target_pil), cv2.COLOR_RGB2BGR)
+  for cnt in range(chk_cnt):
+    # 화면 캡처
+    target_pil = ImageGrab.grab(bbox)
+    img = cv2.cvtColor(np.array(target_pil), cv2.COLOR_RGB2BGR)
 
-        # 전처리
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        contrast = clahe.apply(gray)
+    # 전처리
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    contrast = clahe.apply(gray)
+    kernel = np.array([[0, -1, 0],
+                       [-1, 5, -1],
+                       [0, -1, 0]])
+    sharpened = cv2.filter2D(contrast, -1, kernel)
 
-        kernel = np.array([[0, -1, 0],
-                           [-1, 5, -1],
-                           [0, -1, 0]])
+    # 템플릿 검색
+    for title in temp_img_list:
+      template_path = utils.file_path(title, "image_files")
+      template_img = cv2.imread(
+        template_path, cv2.IMREAD_GRAYSCALE
+      )
 
-        sharpened = cv2.filter2D(contrast, -1, kernel)
+      if template_img is None:
+        raise ValueError(f"템플릿 로드 실패: {template_path}")
 
-        # 템플릿 검색
-        for title in temp_img_list:
-            template_path = utils.file_path(title, "image_files")
-            template_img = cv2.imread(
-                template_path, cv2.IMREAD_GRAYSCALE
-            )
+      try:
+        result = cv2.matchTemplate(
+          sharpened, template_img, cv2.TM_CCOEFF_NORMED
+        )
+      except Exception as e:
+        raise RuntimeError(f"템플릿매칭 오류 발생: {e}") from e
 
-            if template_img is None:
-                raise ValueError(f"템플릿 로드 실패: {template_path}")
+      _, max_val, _, max_loc = cv2.minMaxLoc(result)
 
-            try:
-                result = cv2.matchTemplate(
-                    sharpened, template_img, cv2.TM_CCOEFF_NORMED
-                )
-            except Exception as e:
-                return 2, f"템플릿매칭 오류 발생: {e}"
+      if max_val >= confidence:
+        return True, (title, max_val, max_loc)
 
-            _, max_val, _, max_loc = cv2.minMaxLoc(result)
+    # 마지막 검사에서는 기다릴 필요 없음
+    if cnt < chk_cnt - 1:
+      time.sleep(0.5)
 
-            if max_val >= confidence:
-                return title, "capture_text 성공", max_val, max_loc
+  return False, None
 
-        # 마지막 검사에서는 기다릴 필요 없음
-        if cnt < chk_cnt - 1:
-            time.sleep(0.5)
-
-    return 0, "템플릿 검색 실패"
 
 def find_hsv_center(x, y, width, height, lower, upper, min_area=300):
 
@@ -214,20 +221,20 @@ def find_hsv_center(x, y, width, height, lower, upper, min_area=300):
     )
 
     if not contours:
-        return None
+      return False, None
 
     # 6. 가장 큰 색상 영역
     cnt = max(contours, key=cv2.contourArea)
 
     if cv2.contourArea(cnt) < min_area:
-        return None
+      return False, None
 
     # 7. 중심 좌표
     M = cv2.moments(cnt)
     if M["m00"] == 0:
-        return None
+      return False, None
 
     cx = int(M["m10"] / M["m00"]) + x
     cy = int(M["m01"] / M["m00"]) + y
 
-    return cx, cy
+    return True, (cx, cy)
