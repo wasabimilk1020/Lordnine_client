@@ -50,14 +50,14 @@ def move_on_map(x, y, width=3, height=3, delay=1):
     )
 
     if result == 0:
-        result = img_search_utils.searchImg(
-            'map_chk_2.png',
-            beforeDelay=1, afterDelay=1,
-            justChk=True, _region=(1547, 6, 251, 232)
-        )
+      result = img_search_utils.searchImg(
+        'map_chk_2.png',
+        beforeDelay=1, afterDelay=1,
+        justChk=True, _region=(1547, 6, 251, 232)
+      )
 
-        if result == 0:
-            return 0, "지도 열기 확인 실패"
+      if result == 0:
+        return 0, "지도 열기 확인 실패"
 
     # ===== 지도에서 위치 클릭 =====
     randClick(x, y, width, height, delay)

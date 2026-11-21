@@ -51,28 +51,25 @@ def send_and_wait(cmd, timeout=3.0):
     global ser
 
     if not connect_serial():
-        raise ConnectionError("Serial connection failed")
+      raise ConnectionError("Serial connection failed")
 
     try:
-        # 입력 버퍼 정리
-        ser.reset_input_buffer()
+      # 입력 버퍼 정리
+      ser.reset_input_buffer()
 
-        # 명령 전송
-        ser.write((str(cmd) + "\n").encode("utf-8"))
-        ser.flush()
+      # 명령 전송
+      ser.write((str(cmd) + "\n").encode("utf-8"))
+      ser.flush()
 
-        # ACK 대기
-        start = time.monotonic()
-
-        while time.monotonic() - start < timeout:
-            line = ser.readline().decode(
-                errors="ignore"
-            ).strip()
-
-            if line == "ACK":
-                return True
-
-        raise TimeoutError("Arduino ACK timeout")
+      # ACK 대기
+      start = time.monotonic()
+      while time.monotonic() - start < timeout:
+          line = ser.readline().decode(
+              errors="ignore"
+          ).strip()
+          if line == "ACK":
+              return True
+      raise TimeoutError("Arduino ACK timeout")
 
     except Exception:
         close_serial()
@@ -82,17 +79,17 @@ def send_and_wait(cmd, timeout=3.0):
 # 공통 명령 실행
 def execute_command(cmd, delay=0):
     try:
-        send_and_wait(cmd)
+      send_and_wait(cmd)
 
-        if delay > 0:
-            time.sleep(delay)
+      if delay > 0:
+          time.sleep(delay)
 
-        return True
+      return True
 
     except Exception as e:
-        print("Error:", e)
-        close_serial()
-        return False
+      print("Error:", e)
+      close_serial()
+      return False
 
 
 # 랜덤 좌표 계산
