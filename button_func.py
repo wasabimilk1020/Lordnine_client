@@ -366,7 +366,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
     #   keyboard("1")
     #   time.sleep(2)
 
-    time.sleep(1)
+    time.sleep(3)
     randClick(240,425,10,10,0)  #층수 문제 때문에 일단 다른 던전 한 번 클릭
 
     success, _ = img_search_utils.searchImg('eventDun.png', beforeDelay=1, afterDelay=1, _region=(125, 88, 314, 271))
