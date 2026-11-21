@@ -10,8 +10,8 @@ def go_to_sleep_and_huntingChk(btn_name, character_name, sio):
   serial_comm.keyboard('g')
 
   for i in range(3):
-    result, _=img_search_utils.searchImg('sleepChk.png', beforeDelay=1, afterDelay=0, _region=(811, 638, 299, 232)) 
-    if(result==1):
+    success, _ =img_search_utils.searchImg('sleepChk.png', beforeDelay=1, afterDelay=0, _region=(811, 638, 299, 232)) 
+    if success:
       sio.emit("logEvent",["사냥 완료", character_name, STATUS_MSG])
       return
     

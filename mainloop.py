@@ -6,59 +6,63 @@ import check_hunting
 from waking_from_sleep import *
 from go_to_sleep import *
 import copy
+import logging
 
 ERR_MSG = 0
 STATUS_MSG = 1
 
 def mainLoop(sio, btn_func, func_data, id_handle, btn_name):
   for character_name, handle in id_handle:
-    if win32gui.IsWindow(handle):
-      sio.emit("logEvent",[f"{btn_name} 시작", character_name, STATUS_MSG]) 
-
-      return_val=img_search_utils.getWindow(handle) #윈도우 앞으로 가져옴 return 1, "성공"
-      if return_val[0]==0:  #핸들은 존재하는데 윈도우가 없는 상태
-        sio.emit("logEvent",[return_val[1], character_name, ERR_MSG])
-        continue 
-
-      #절전 모드 해제 및 사망 체크
-      if btn_name !="status_check_button":  #status_check는 절전모드 해제를 안한다는 뜻
-        #절전해제 및 사망체크
-        waking_from_sleep_and_deathChk(sleep_time=2)  #두 번째 인자 time.sleep
-
-      #버튼 일정 수행 및 절전 모드
-      result=btn_func(sio, func_data, btn_name, character_name, handle) #result[0]=성공여부, result[1]=메세지
-      try:
-        message=result[1]
-        if result[0]==0:
-          sio.emit("logEvent",[message, character_name, ERR_MSG])
-        elif result[0]==1:  #일반루틴 완료메세지
-          #절전모드
-          go_to_sleep_and_huntingChk(btn_name, character_name, sio)
-        elif result[0]==2:  #statusChk 완료메세지
-          sio.emit("logEvent",[f"{message} 완료", character_name, STATUS_MSG])
-        elif result[0]==3:  #diamond 완료메세지
-          diamond=message
-          data=[]
-          data.append(diamond)
-          data.append(character_name)
-          sio.emit("get_diamond",data)
-          #절전모드
-          go_to_sleep_and_huntingChk(btn_name, character_name, sio)
-        elif result[0]==4:  #임시버튼용 빨리 클릭하기 위해서 나중에 없애자
-          pass
-      except Exception as e:
-        sio.emit("logEvent", [f"message result 에러: {e}", character_name, ERR_MSG])
-        continue
-    else:
-      print("핸들 없음",handle)
-      sio.emit("logEvent",["윈도우 없음", character_name, ERR_MSG])
+    if not win32gui.IsWindow(handle):
+      print("핸들 없음", handle)
+      sio.emit("logEvent", ["윈도우 없음", character_name, ERR_MSG])
       continue
- 
-  sio.emit("stop_animation",btn_name)
 
-      
-      
-      
+    try:
+      sio.emit("logEvent", [f"{btn_name} 시작", character_name, STATUS_MSG])
+
+      # 윈도우 앞으로 가져오기 (기존 반환값 유지)
+      window_result = img_search_utils.getWindow(handle)
+      if window_result[0] == 0:
+        sio.emit("logEvent", [window_result[1], character_name, ERR_MSG])
+        continue
+
+      # 절전 해제 및 사망 체크
+      if btn_name != "status_check_button":
+        waking_from_sleep_and_deathChk(sleep_time=2)
+
+      # 버튼 루틴 실행
+      success, data = btn_func(
+        sio, func_data, btn_name, character_name, handle
+      )
+
+      # 루틴 실패
+      if not success:
+        sio.emit("logEvent", [data["message"], character_name, ERR_MSG])
+        continue
+
+      # 성공 이후의 처리
+      action = data["action"]
+      message = data["message"]
+
+      if action == "sleep":
+        go_to_sleep_and_huntingChk(btn_name, character_name, sio)
+
+      elif action == "status":
+        sio.emit("logEvent", [f"{message} 완료", character_name, STATUS_MSG])
+
+      elif action == "skip":
+        pass
+
+      else:
+        raise ValueError(f"알 수 없는 루틴 처리 방식: {action}")
+
+    except Exception as e:
+      logging.exception(f"mainLoop 실행 오류: {character_name}")
+      sio.emit("logEvent", [f"루틴 실행 오류: {e}", character_name, ERR_MSG])
+      continue
+
+  sio.emit("stop_animation", btn_name)
 
 
     
