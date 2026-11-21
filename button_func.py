@@ -152,11 +152,11 @@ def normalHunting(sio, data, btn_name, character_name, handle):
 
   success, _ = img_search_utils.searchImg('storeBuy.png', beforeDelay=5, afterDelay=5, _region=(1500,660,420,300))
   if not success:
-    return False, {"action": "sleep", "message": "귀환 실패"}
+    return False, {"message": "귀환 실패"}
 
   success, _ = img_search_utils.searchImg('autoBuy.png', beforeDelay=0, afterDelay=1, chkCnt=20, _region=(75,845,350,200))
   if not success:
-    return False, {"action": "sleep", "message": "자동구매 실패"}
+    return False, {"message": "자동구매 실패"}
 
   randClick(1045,800,10,10,1) #확인
   escKey()
@@ -166,31 +166,31 @@ def normalHunting(sio, data, btn_name, character_name, handle):
 
   success, _ = img_search_utils.searchImg('favorite.png', beforeDelay=2, afterDelay=1, _region=(0,820,100,150))
   if not success:
-    return False, {"action": "sleep", "message": "즐겨찾기 실패"}
+    return False, {"message": "즐겨찾기 실패"}
 
   success, _ = img_search_utils.searchImg('hunting_place.png', beforeDelay=0, afterDelay=2, _region=(70,220,250,400))
   if not success:
-    return False, {"action": "sleep", "message": "사냥터 클릭 실패"}
+    return False, {"message": "사냥터 클릭 실패"}
 
   success, _ = img_search_utils.searchImg('hunting_portal.png', beforeDelay=0, afterDelay=1, _region=(1490,155,400,800))
   if not success:
-    return False, {"action": "sleep", "message": "포탈 클릭 실패"}
+    return False, {"message": "포탈 클릭 실패"}
 
   randClick(1735,990,10,10,1) #빠른이동
   success, _ = img_search_utils.searchImg('confirm.png', beforeDelay=0, afterDelay=7, _region=(985,575,300,200))
   if not success:
-    return False, {"action": "sleep", "message": "확인 실패"}
+    return False, {"message": "확인 실패"}
 
   match_list=["chk.png"]
   success, match_data=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
   if not success:
-    return False, {"action": "sleep", "message": "이동 체크 실패"}
+    return False, {"message": "이동 체크 실패"}
   time.sleep(2)
 
   #지도 열고 이동
   success, message = move_on_map(835, 690, 3, 3, 1)
   if not success:
-    return False, {"action": "sleep", "message": message}
+    return False, {"message": message}
 
   for i in range(50):
     success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
@@ -200,7 +200,7 @@ def normalHunting(sio, data, btn_name, character_name, handle):
   #공격
   success, message = start_attack()
   if not success:
-    return False, {"action": "sleep", "message": message}
+    return False, {"message": message}
 
   img_search_utils.caputure_image(name, 180, 180, sio) #name, x, y, sio
 
@@ -210,18 +210,18 @@ def normalHunting(sio, data, btn_name, character_name, handle):
 
 
 def postBox(sio, data,btn_name, character_name, handle):
-  keyboard(',')
+  pass
+  # keyboard(',')
   
-  result=img_search_utils.searchImg('allAccept.png',beforeDelay=1, afterDelay=2)
-  if(result==0):  
-    return 0, "우편 모두받기 실패"
+  # result=img_search_utils.searchImg('allAccept.png',beforeDelay=1, afterDelay=2)
+  # if(result==0):  
+  #   return 0, "우편 모두받기 실패"
 
-  img_search_utils.searchImg('confirm.png',beforeDelay=1, afterDelay=1, accuracy=0.9, _region=(920,580,300,200))
+  # img_search_utils.searchImg('confirm.png',beforeDelay=1, afterDelay=1, accuracy=0.9, _region=(920,580,300,200))
 
-  escKey()  #우편 나가기
+  # escKey()  #우편 나가기
   
-  return 1, "message:None"
-
+  # return 1, "message:None"
 
 
 #---------던전---------#
@@ -253,7 +253,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
     #지도 열고 이동
     success, message = move_on_map(960,700,3,3,1)
     if not success:
-      return False, {"action": "sleep", "message": message}
+      return False, {"message": message}
 
     for i in range(50):
       success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
@@ -288,7 +288,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
     #지도 열고 이동
     success, message = move_on_map(900,490,3,3,1)
     if not success:
-      return False, {"action": "sleep", "message": message}
+      return False, {"message": message}
 
     for i in range(50):
       success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
@@ -343,22 +343,22 @@ def dungeon(sio, data, btn_name, character_name, handle):
       keyboard("4")
       time.sleep(2)
 
-    keyboard('v')
-    img_search_utils.searchImg('stop_schedule.png',beforeDelay=0.5, afterDelay=0.5, _region=(1260,790,300,100))
-    randClick(1075,820,10,10,0.5) #초기화 클릭
+    # keyboard('v')
+    # img_search_utils.searchImg('stop_schedule.png',beforeDelay=0.5, afterDelay=0.5, _region=(1260,790,300,100))
+    # randClick(1075,820,10,10,0.5) #초기화 클릭
 
-    result=img_search_utils.searchImg('sanga.png',beforeDelay=0.5, afterDelay=0.5, _region=(480, 455, 400, 300))
-    if(result==0):
-      return 0, "상아탑 클릭 실패"
+    # result=img_search_utils.searchImg('sanga.png',beforeDelay=0.5, afterDelay=0.5, _region=(480, 455, 400, 300))
+    # if(result==0):
+    #   return 0, "상아탑 클릭 실패"
 
-    randClick(coord[0],coord[1],coord[2],coord[3],1)  #층 클릭 (설정 해줘야함 json에서)
+    # randClick(coord[0],coord[1],coord[2],coord[3],1)  #층 클릭 (설정 해줘야함 json에서)
 
-    result_coord=img_search_utils.searchImg('plus.png',beforeDelay=0, afterDelay=0, justChk=True, _region=(1450,340,200,100)) #시간충전 좌표
+    # result_coord=img_search_utils.searchImg('plus.png',beforeDelay=0, afterDelay=0, justChk=True, _region=(1450,340,200,100)) #시간충전 좌표
 
-    for i in range(7):
-      randClick(result_coord[0],result_coord[1],0,0,0.3) #시간 충전
+    # for i in range(7):
+    #   randClick(result_coord[0],result_coord[1],0,0,0.3) #시간 충전
 
-    result_3=img_search_utils.searchImg('clk_schedule_start.png',beforeDelay=0, afterDelay=0, _region=(1260,790,300,100))
+    # result_3=img_search_utils.searchImg('clk_schedule_start.png',beforeDelay=0, afterDelay=0, _region=(1260,790,300,100))
 
   elif btn_name=="이벤트던전":
     keyboard('`') #던전
@@ -386,7 +386,7 @@ def dungeon(sio, data, btn_name, character_name, handle):
     #지도 열고 이동
     success, message = move_on_map(940,610,3,3,1)
     if not success:
-      return False, {"action": "sleep", "message": message}
+      return False, {"message": message}
 
     for i in range(50):
       success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
@@ -405,93 +405,90 @@ def dungeon(sio, data, btn_name, character_name, handle):
 
 #---------아이템 변경---------#
 def switch_get_item(sio, data, btn_name, character_name, handle):
-  coord=data
-  delay=data[4]
-  name=character_name
+  pass
+  # coord=data
+  # delay=data[4]
+  # name=character_name
 
-  keyboard("x") #환경설정
-  result=img_search_utils.searchImg('setting_get_btn.png', beforeDelay=1, afterDelay=1, _region=(355,370,200,200))
-  if(result==0):
-    return 0, "세팅 획득 버튼클릭 실패"
+  # keyboard("x") #환경설정
+  # result=img_search_utils.searchImg('setting_get_btn.png', beforeDelay=1, afterDelay=1, _region=(355,370,200,200))
+  # if(result==0):
+  #   return 0, "세팅 획득 버튼클릭 실패"
   
-  if btn_name=="모두":
-    result=img_search_utils.searchImg('allItem.png', beforeDelay=1, afterDelay=1, _region=(1210,360,200,150))
-    if(result==0):
-      return 0, "모두 클릭 실패"
+  # if btn_name=="모두":
+  #   result=img_search_utils.searchImg('allItem.png', beforeDelay=1, afterDelay=1, _region=(1210,360,200,150))
+  #   if(result==0):
+  #     return 0, "모두 클릭 실패"
     
-    img_search_utils.caputure_image(name, 1295, 400, sio) #name, x, y, sio
+  #   img_search_utils.caputure_image(name, 1295, 400, sio) #name, x, y, sio
 
-  elif btn_name=="고급":
-    result=img_search_utils.searchImg('greenItem.png', beforeDelay=1, afterDelay=1, _region=(1015,400,200,150))
-    if(result==0):
-      return 0, "고급 클릭 실패"
+  # elif btn_name=="고급":
+  #   result=img_search_utils.searchImg('greenItem.png', beforeDelay=1, afterDelay=1, _region=(1015,400,200,150))
+  #   if(result==0):
+  #     return 0, "고급 클릭 실패"
     
-    img_search_utils.caputure_image(name, 1120, 450, sio) #name, x, y, sio
+  #   img_search_utils.caputure_image(name, 1120, 450, sio) #name, x, y, sio
 
-  elif btn_name=="희귀":
-    result=img_search_utils.searchImg('blueItem.png', beforeDelay=1, afterDelay=1, _region=(1190,400,200,150))
-    if(result==0):
-      return 0, "희귀 클릭 실패"
+  # elif btn_name=="희귀":
+  #   result=img_search_utils.searchImg('blueItem.png', beforeDelay=1, afterDelay=1, _region=(1190,400,200,150))
+  #   if(result==0):
+  #     return 0, "희귀 클릭 실패"
     
-    img_search_utils.caputure_image(name, 1280, 450, sio) #name, x, y, sio
+  #   img_search_utils.caputure_image(name, 1280, 450, sio) #name, x, y, sio
 
-  escKey()  #나가기
-  return 1, "message:None"
+  # escKey()  #나가기
+  # return 1, "message:None"
 
 def decomposeItem(sio, data,btn_name, character_name, handle):
   coord=data
   delay=data[4]
   name=character_name
 
-  keyboard("i") #인벤토리
-  time.sleep(1)
-  randClick(1850,310,5,5,1) #장비 메뉴
-  randClick(1540,520,5,5,2) #아이템 클릭
-  result=img_search_utils.searchImg('decompose_item.png', beforeDelay=0, afterDelay=2, _region=(1265,645,200,200))
-  if(result==0):
-    return 0, "분해 클릭 실패"
+  keyboard("=") #인벤토리
 
-  result=img_search_utils.searchImg('item_auto_registration.png', beforeDelay=0, afterDelay=2, _region=(1290,805,300,150))
-  if(result==0):
-    return 0, "아이템분해 실패"
+  success, _ =img_search_utils.searchImg('item_auto_registration.png', beforeDelay=2, afterDelay=2, _region=(1290,805,300,150))
+  if not success:
+    return False, {"message":"분해 실패"}
   
   spaceKey()
   time.sleep(2)
   spaceKey()
-  time.sleep(1)
+  time.sleep(4)
   img_search_utils.caputure_image(name, 459, 285, sio) #name, x, y, sio
   escKey()
   time.sleep(1)
-  
-  return 1, "message:None"
+
+  return True, {"action": "sleep", "message":"분해 완료"}
 
 def decomposeBook(sio, data,btn_name, character_name,handle):
-  coord=data
-  delay=data[4]
-  name=character_name
+  pass
+  # coord=data
+  # delay=data[4]
+  # name=character_name
 
-  keyboard("9") #분해
-  time.sleep(1)
+  # keyboard("9") #분해
+  # time.sleep(1)
 
-  randClick(1480,735,5,5,0.5) #분해 목록
-  randClick(1395,730,10,10,0.5) #분해 목록 확인
-  randClick(1321,735,5,5,0.5) #분해
+  # randClick(1480,735,5,5,0.5) #분해 목록
+  # randClick(1395,730,10,10,0.5) #분해 목록 확인
+  # randClick(1321,735,5,5,0.5) #분해
 
-  img_search_utils.searchImg('confirm.png', beforeDelay=1, afterDelay=1, chkCnt=2, _region=(920,580,300,200))
+  # img_search_utils.searchImg('confirm.png', beforeDelay=1, afterDelay=1, chkCnt=2, _region=(920,580,300,200))
   
-  img_search_utils.caputure_image(name, 1280, 340, sio) #name, x, y, sio
+  # img_search_utils.caputure_image(name, 1280, 340, sio) #name, x, y, sio
 
-  return 1, "message:None"
+  # return 1, "message:None"
   
 def deathChk(sio, data,btn_name, character_name, handle):
-  coord=data
-  delay=data[4]
-  name=character_name
-  img_search_utils.searchImg('confirm.png', beforeDelay=1, afterDelay=1, chkCnt=2, _region=(920,580,300,200))
+  pass
+  # coord=data
+  # delay=data[4]
+  # name=character_name
+  # img_search_utils.searchImg('confirm.png', beforeDelay=1, afterDelay=1, chkCnt=2, _region=(920,580,300,200))
 
-  img_search_utils.caputure_image(name, 1145, 195, sio) #name, x, y, sio
+  # img_search_utils.caputure_image(name, 1145, 195, sio) #name, x, y, sio
 
-  return 1, "message:None"
+  # return 1, "message:None"
 
 
 def showDiamond(sio, data, btn_name, character_name, handle):
@@ -704,44 +701,46 @@ def event_store(sio, data,btn_name, character_name, handle):
   result=normalHunting(sio, data,btn_name, character_name, handle)
   return result
 
+
 #거리 10M
-def ten_meter(sio, data,btn_name, character_name, handle):
+def ten_meter(sio, data, btn_name, character_name, handle):
   coord=data
   delay=data[4]
   name=character_name
 
   keyboard("x") #환경설정
 
-  result=img_search_utils.searchImg('ten_meter.png', beforeDelay=1, afterDelay=1, _region=(1075,255,850,150)) 
-  if(result==0):
-    return 0, "10M 클릭 실패"
+  success, _ = img_search_utils.searchImg('ten_meter.png', beforeDelay=1, afterDelay=1, _region=(1075,255,850,150))
+  if not success:
+    return False, {"message": "10M 클릭 실패"}
 
   img_search_utils.caputure_image(name, 1210, 290, sio) #name, x, y, sio
 
   escKey()  #나가기
   time.sleep(1)
 
-  return 1, "message:None"
+  return True, {"action": "sleep", "message": "message:None"}
+
 
 #거리 제한없음
-def unlimit(sio, data,btn_name, character_name, handle):
+def unlimit(sio, data, btn_name, character_name, handle):
   coord=data
   delay=data[4]
   name=character_name
 
   keyboard("x") #환경설정
-  
 
-  result=img_search_utils.searchImg('unlimit_meter.png', beforeDelay=1, afterDelay=1, _region=(1075,255,850,150)) 
-  if(result==0):
-    return 0, "제한없음 클릭 실패"
+  success, _ = img_search_utils.searchImg('unlimit_meter.png', beforeDelay=1, afterDelay=1, _region=(1075,255,850,150))
+  if not success:
+    return False, {"message": "제한없음 클릭 실패"}
 
-  img_search_utils.caputure_image(name, 1765,290, sio) #name, x, y, sio
+  img_search_utils.caputure_image(name, 1765, 290, sio) #name, x, y, sio
 
   escKey()  #나가기
   time.sleep(1)
 
-  return 1, "message:None"
+  return True, {"action": "sleep", "message": "message:None"}
+
 
 #데일리 출석 루틴
 def daily(sio, data,btn_name, character_name, handle):
@@ -856,9 +855,9 @@ def morning(sio, data,btn_name, character_name, handle):
   #화면 전화 의미 없는 것 하지 말고 길드 들어 갔을 때 나오는 문자를 이미지서치하자.
   randClick(910,585,10,10,2)  #화면 전환을 위한 클릭
   spaceKey()  #길드 기부
-  result=img_search_utils.searchImg('donation.png',beforeDelay=2, afterDelay=1, _region=(690,665,200,150))
-  if(result==0):
-    return 0, "기부 실패"
+  success, _ =img_search_utils.searchImg('donation.png',beforeDelay=2, afterDelay=1, _region=(690,665,200,150))
+  if not success:
+    return False, {"message": "기부 실패"}
   else: 
     for i in range(5):
       randClick(750,720,0,0,1)
@@ -882,37 +881,39 @@ def morning(sio, data,btn_name, character_name, handle):
   keyboard('b') #귀환
 
   #--우호도 상인
-  result=img_search_utils.searchImg('good_store.png',beforeDelay=5, afterDelay=5, _region=(1500,660,420,300))
-  if(result==0):
-    return 0, "귀환 실패"
+  success, _ =img_search_utils.searchImg('good_store.png',beforeDelay=5, afterDelay=5, _region=(1500,660,420,300))
+  if not success:
+    return False, {"message": "귀환 실패"}
 
-  result=img_search_utils.searchImg('autoBuy.png',beforeDelay=0, afterDelay=1, chkCnt=15, justChk=True, _region=(75,845,350,200))
-  y=290
-  if(result!=0):
+  
+  success, _ = img_search_utils.searchImg('autoBuy.png', beforeDelay=0, afterDelay=1, chkCnt=15, justChk=True, _region=(75,845,350,200))
+  y = 290
+  if success:
     for i in range(3):
-      randClick(32,y,10,10,1)
-      result=img_search_utils.searchImg('autoBuy.png',beforeDelay=0, afterDelay=1, _region=(75,845,350,200))
-      result=img_search_utils.searchImg('good_confirm.png', beforeDelay=0, afterDelay=1, _region=(970,780,300,200))
-      if(result==0):
-        return 0, "확인 실패"
-      y=y+75 
+      randClick(32, y, 10, 10, 1)
+      img_search_utils.searchImg('autoBuy.png', beforeDelay=0, afterDelay=1, _region=(75,845,350,200))
+      success, _ = img_search_utils.searchImg('good_confirm.png', beforeDelay=0, afterDelay=1, _region=(970,780,300,200))
+      if not success:
+        return False, {"message": "확인 실패"}
+      y = y + 75
   else:
-    return 0, "우호상인 실패"
+    return False, {"message": "우호상인 실패"}
+  
   escKey()
 
   #--룬 상인
-  result=img_search_utils.searchImg('roon_store.png',beforeDelay=1, afterDelay=5, _region=(1500,660,420,300))
-  if(result==0):
-    return 0, "룬 상인 실패"
+  success, _ =img_search_utils.searchImg('roon_store.png',beforeDelay=1, afterDelay=5, _region=(1500,660,420,300))
+  if not success:
+    return False, {"message": "룬 상인 실패"}
 
-  result=img_search_utils.searchImg('roon.png',beforeDelay=0, afterDelay=1, chkCnt=10, _region=(85,115,300,300))
-  if(result==0):
-    return 0, "룬 클릭 실패"
+  success, _ =img_search_utils.searchImg('roon.png',beforeDelay=0, afterDelay=1, chkCnt=10, _region=(85,115,300,300))
+  if not success:
+    return False, {"message": "룬 클릭 실패"}
 
   randClick(1110,595,5,5,1) #max
-  result=img_search_utils.searchImg('buy.png', beforeDelay=0, afterDelay=1, _region=(970,745,300,200))
-  if(result==0):
-    return 0, "구매 실패"
+  success, _ =img_search_utils.searchImg('buy.png', beforeDelay=0, afterDelay=1, _region=(970,745,300,200))
+  if not success:
+    return False, {"message": "구매 실패"}
 
   escKey()
   time.sleep(1)
