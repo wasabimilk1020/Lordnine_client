@@ -22,9 +22,9 @@ def mainLoop(sio, btn_func, func_data, id_handle, btn_name):
       sio.emit("logEvent", [f"{btn_name} 시작", character_name, STATUS_MSG])
 
       # 윈도우 앞으로 가져오기 (기존 반환값 유지)
-      window_result = img_search_utils.getWindow(handle)
-      if window_result[0] == 0:
-        sio.emit("logEvent", [window_result[1], character_name, ERR_MSG])
+      success, message = img_search_utils.getWindow(handle)
+      if not success:
+        sio.emit("logEvent", [message, character_name, ERR_MSG])
         continue
 
       # 절전 해제 및 사망 체크

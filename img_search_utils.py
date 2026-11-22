@@ -4,6 +4,7 @@ import time
 import pyautogui
 import datetime
 import base64
+import win32con
 import win32com.client
 shell = win32com.client.Dispatch("WScript.Shell")
 import win32gui
@@ -40,7 +41,7 @@ def searchImg(imgTitle, beforeDelay, afterDelay, justChk=False, coord=[], chkCnt
         randClick(coord[0], coord[1], coord[2], coord[3], 0)
       elif justChk:  # 클릭 없이 이미지 체크만 할 경우
         time.sleep(afterDelay)
-        return True, result
+        return True, result 
       else:  # 이미지 클릭
         randClick(result[0], result[1], result[2], result[3], 0)
 
@@ -71,22 +72,47 @@ def caputure_image(name,x,y,sio):
   data=[name, nowDatetime, captureImg] 
   sio.emit("captured_image",data)
 
+# def getWindow(handle):
+#   try:
+#     time.sleep(0.1)
+#     shell.SendKeys('%')
+#     win32gui.SetForegroundWindow(handle)
+#     time.sleep(0.1)
+
+#     if win32gui.GetForegroundWindow() != handle:
+#       return False, "윈도우 활성화 실패"
+
+#     startClick(850, 440, 100, 100, 0)
+#     return True, "성공"
+
+#   except Exception as e:
+#     raise RuntimeError(f"윈도우 오류: {e}") from e
+
 def getWindow(handle):
   try:
-    time.sleep(0.1)
-    shell.SendKeys('%')
-    win32gui.SetForegroundWindow(handle)
-    time.sleep(0.1)
+    # 최소화된 창이면 복원
+    if win32gui.IsIconic(handle):
+      win32gui.ShowWindow(handle, win32con.SW_RESTORE)
 
+    # 이미 활성화되어 있지 않을 때만 시도
     if win32gui.GetForegroundWindow() != handle:
-        return 0, "윈도우 활성화 실패"
-    
-    startClick(850, 440, 100, 100, 0)
-    return 1, "성공"
-  
-  except Exception as e:
-    return 0, f"윈도우 오류: {e}"
+      shell.SendKeys('%')
+      win32gui.SetForegroundWindow(handle)
 
+      # 최대 0.5초 동안 활성화 확인
+      for i in range(10):
+        if win32gui.GetForegroundWindow() == handle:
+          break
+        time.sleep(0.05)
+
+      else:
+        return False, "윈도우 활성화 실패"
+
+    startClick(850, 440, 100, 100, 0)
+    return True, "성공"
+
+  except Exception as e:
+    raise RuntimeError(f"윈도우 오류: {e}") from e
     
 
 # x, y, width, height = 810, 660, 295, 65 #자동 사냥 범위
