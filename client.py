@@ -61,12 +61,15 @@ sio = socketio.Client()
 def connect():
   global last_pong_time
   global character_list
-  print('connection established')   
-  # character_list=get_account.get_account_list(sio) #윈도우를 돌면서 어카운트 정보를 얻음
-  last_pong_time = time.time()  #서버가 다시 연결되었을 때 타이머 초기화 (이전 타이머 값이 남아있을 경우 방지)
+
+  print('connection established')
+  last_pong_time = time.time()
 
   if serial_comm.ser is None or not serial_comm.ser.is_open:
-    serial_comm.connect_serial()
+    try:
+      serial_comm.connect_serial()
+    except Exception as e:
+      logging.error(f"시리얼 연결 실패: {e}")
 
   sio.start_background_task(monitor_connection)
   sio.start_background_task(send_ping)
@@ -74,12 +77,14 @@ def connect():
 @sio.event
 def disconnect():
   global last_pong_time
-  print("disconncet 호출! 서버와 연결 끊김")
-  last_pong_time = None #퐁 타임 초기화
+
+  last_pong_time = None
+
   if serial_comm.ser is not None and serial_comm.ser.is_open:
-    # serial_comm.ser.flushInput()
-    # serial_comm.ser.flushOutput()
-    serial_comm.close_serial()
+    try:
+      serial_comm.close_serial()
+    except Exception as e:
+      logging.error(f"시리얼 연결 종료 실패: {e}")
 
 @sio.event
 def reqAccount(data):
@@ -255,3 +260,6 @@ sio.wait()
 #normalHunting 앞 부분 루틴 안정성 있게 만들자. 지도 여는 부분을 수정하라고 하는대 다시 확인하고 질문 해보자
 #로그 기록 되게 추가하자.
 #주석 처리 할 것 처리해서 chatgpt에게 파일 올려 구조 파악하게 하자.
+
+
+# searchImg('상큼딸기.png', beforeDelay=0, afterDelay=0, _region=(1179, 92, 286, 236))
