@@ -444,12 +444,13 @@ def decomposeItem(sio, data,btn_name, character_name, handle):
   delay=data[4]
   name=character_name
 
-  keyboard("=") #인벤토리
-  time.sleep(1)
-  randClick(930,155,10,10,0)  #아이템 분해 클릭 (화면에 글씨 표시 되는 부분이라 이미서치 안함)
-  #이 부분에 제대로 클릭이 됬는지 확인하는 루틴 필요함
+  keyboard("=") #장비공방
+  success, _ =img_search_utils.searchImg('decomposeItem.png', beforeDelay=2, afterDelay=2, _region=(754, 44, 370, 234))
+  if not success:
+    randClick(930,155,10,10,0)  #아이템 분해 클릭 (화면에 글씨 표시 되는 부분이라 이미서치 안되면)
+  #이 부분에 무조건 클릭되게 하면 안되고 클릭 해도 되는지 확인이 먼저 필요함
 
-  success, _ =img_search_utils.searchImg('item_auto_registration.png', beforeDelay=2, afterDelay=2, _region=(1290,805,300,150))
+  success, _ =img_search_utils.searchImg('item_auto_registration.png', beforeDelay=1, afterDelay=2, _region=(1290,805,300,150))
   if not success:
     return False, {"message":"분해 실패"}
   
