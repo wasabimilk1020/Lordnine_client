@@ -89,8 +89,13 @@ def disconnect():
 @sio.event
 def reqAccount(data):
   global character_list   
-  character_list=get_account.get_account_list(sio) #윈도우를 돌면서 어카운트 정보를 얻음
-  sio.emit("revAccount", character_list)
+  success, result = get_account.get_account_list(sio)
+
+  if success:
+    character_list = result
+    sio.emit("revAccount", character_list)
+  else:
+    print(result)
 
 #이렇게 일일이 버튼을 맵핑시켜주는게 아니라 버튼 생성하면 저절로 처리되도록 만들고 싶은데...
 button_mapping={
@@ -260,6 +265,8 @@ sio.wait()
 #normalHunting 앞 부분 루틴 안정성 있게 만들자. 지도 여는 부분을 수정하라고 하는대 다시 확인하고 질문 해보자
 #로그 기록 되게 추가하자.
 #주석 처리 할 것 처리해서 chatgpt에게 파일 올려 구조 파악하게 하자.
+#왜 그런진 모르겠는대 부활 루틴이 잘 안됨.
 
 
-# searchImg('상큼딸기.png', beforeDelay=0, afterDelay=0, _region=(1179, 92, 286, 236))
+#set_account 잘 되는대 문제가 접속 하자마자 되는 문제.
+#절전모드로 진입을 안함

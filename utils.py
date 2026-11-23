@@ -26,3 +26,18 @@ def load_json(json_file, json_folder): #file, folder
   except (FileNotFoundError, json.JSONDecodeError):
     return {}  # 파일이 없거나 잘못된 JSON이면 빈 데이터 반환
 
+def save_json(json_file, json_folder, data):
+  full_path = file_path(json_file, json_folder)
+  temp_path = full_path + ".tmp"
+
+  try:
+    with open(temp_path, "w", encoding="utf-8") as f:
+      json.dump(data, f, ensure_ascii=False, indent=2)
+
+    # 저장이 완료되면 기존 파일 교체
+    os.replace(temp_path, full_path)
+
+    return True, full_path
+
+  except Exception as e:
+    raise RuntimeError(f"JSON 저장 오류 ({full_path}): {e}") from e

@@ -120,36 +120,39 @@ def getWindow(handle):
 # binary_value=130
 
 def capture_text_from_region(x, y, width, height, _config, binary_val):
-  binary_value=binary_val
-  # 화면의 특정 영역 캡처
   bbox = (x, y, x + width, y + height)
+
   try:
     screenshot = ImageGrab.grab(bbox)
-    # screenshot.save("origin.png")
+
+    # 이미지 확대
+    scaled = screenshot.resize(
+      (screenshot.width * 2, screenshot.height * 2),
+      Image.Resampling.LANCZOS
+    )
+
+    # 흑백 변환 및 대비 증가
+    grayscale = scaled.convert("L")
+    enhanced = ImageEnhance.Contrast(grayscale).enhance(2.0)
+
+    # 이진화 및 반전
+    binary = enhanced.point(
+      lambda x: 0 if x < binary_val else 255
+    )
+    inverted_image = ImageOps.invert(binary)
+
+    # OCR
+    text = pytesseract.image_to_string(
+      inverted_image, lang='kor', config=_config
+    ).strip()
+
   except Exception as e:
-    return 0, f"ImageGrab 실행 중 오류 발생: {e}"
-  # 크기 키우기
-  scaled = screenshot.resize((screenshot.width * 2, screenshot.height * 2), Image.Resampling.LANCZOS)
+    raise RuntimeError(f"OCR 처리 오류: {e}") from e
 
-  # 전처리: 흑백 변환 및 대비 증가
-  grayscale = scaled.convert("L")  # 흑백 이미지로 변환
-  # grayscale.save("greyscale_img.png")
-  enhanced = ImageEnhance.Contrast(grayscale).enhance(2.0)  # 대비 조정
-  # enhanced.save("enhanced_img.png")
-  binary = enhanced.point(lambda x: 0 if x < binary_value else 255, '1')  # 이진화 처리
-  # binary.save("binary_img.png")
+  if not text:
+    return False, "문자 인식 실패"
 
-  # 이미지 반전
-  inverted_image = ImageOps.invert(binary)
-  # inverted_image.save("inverted_img.png")
-
-  # OCR로 문자 추출
-  try:
-    text = pytesseract.image_to_string(inverted_image, lang='kor',config=_config)  
-  except Exception as e:
-    return 0, f"OCR 실행 중 오류 발생: {e}"
-
-  return text, "capture_text 성공"
+  return True, text
 
 def preprocess_image(temp_imgTitle, output_path):  #이미지 전처리
   input_path=utils.file_path(f"{temp_imgTitle}","image_files")  #file, folder, sub_folder
@@ -196,12 +199,16 @@ def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75, chk_c
     # 템플릿 검색
     for title in temp_img_list:
       template_path = utils.file_path(title, "image_files")
-      template_img = cv2.imread(
-        template_path, cv2.IMREAD_GRAYSCALE
-      )
+      try:
+        template_img = cv2.imdecode(
+          np.fromfile(template_path, dtype=np.uint8),
+          cv2.IMREAD_GRAYSCALE
+        )
+      except Exception as e:
+        raise RuntimeError(f"템플릿 파일 읽기 오류 ({template_path}): {e}") from e
 
       if template_img is None:
-        raise ValueError(f"템플릿 로드 실패: {template_path}")
+        raise ValueError(f"템플릿 이미지 디코딩 실패: {template_path}")
 
       try:
         result = cv2.matchTemplate(

@@ -453,7 +453,8 @@ def decomposeItem(sio, data,btn_name, character_name, handle):
   success, _ =img_search_utils.searchImg('item_auto_registration.png', beforeDelay=1, afterDelay=2, _region=(1290,805,300,150))
   if not success:
     return False, {"message":"분해 실패"}
-  
+  #아이템 분해 할게 없어서 아무것도 등록 안되도 아래 부분이 진행되고 정상 종료 되야 하는대
+  #위의 이미지 서치 자체가 실패하는건가???
   spaceKey()
   time.sleep(3)
   spaceKey()
@@ -523,14 +524,17 @@ def showDiamond(sio, data, btn_name, character_name, handle):
     config = "--psm 7 -c tessedit_char_whitelist=0123456789,"
     binary_val = 150
 
-    text = img_search_utils.capture_text_from_region(
+    success, text = img_search_utils.capture_text_from_region(
       x, y, capture_width, height, config, binary_val
     )
 
-    if text[0] == 0:
-      return False, {"message": text[1]}
+    if not success:
+      return False, {"message": text}
 
-    numbers = ''.join(re.findall(r'\d+', re.sub(r"[.,]", "", text[0])))
+    numbers = ''.join(re.findall(r'\d+', re.sub(r"[.,]", "", text)))
+    if not numbers:
+      return False, {"message": "다이아 숫자 추출 실패"}
+    
     diamond = numbers
 
   else:

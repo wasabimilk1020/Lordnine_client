@@ -41,7 +41,7 @@ def mainLoop(sio, btn_func, func_data, id_handle, btn_name):
         sio.emit("logEvent", [data["message"], character_name, ERR_MSG])
         continue
 
-      # 성공 이후의 처리
+      # 절전 모드 및 성공 이후의 처리
       action = data["action"]
       message = data["message"]
 
