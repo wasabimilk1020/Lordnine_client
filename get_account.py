@@ -50,10 +50,18 @@ def get_account_list(sio):
     if hwnd in current_handles:
       account_dict[name] = hwnd 
 
+  # 캐릭터 이미지 폴더
+  accounts_dir = utils.file_path("", "image_files", "accounts")
+
+  # PNG 파일 목록 자동 생성
   match_list = [
-    r"accounts\상큼딸기.png",
-    r"accounts\갤럭시플립.png"
+    os.path.join("accounts", filename)
+    for filename in sorted(os.listdir(accounts_dir))
+    if filename.lower().endswith(".png")
   ]
+
+  if not match_list:
+    return False, "캐릭터 이미지 파일 없음"
 
   # 새로 발견된 핸들만 처리
   for hwnd in lin_handles:
@@ -89,7 +97,7 @@ def get_account_list(sio):
 
     account_dict[character_name] = hwnd
 
-    escKey()
+    keyboard('x') #설정 창 나가기
 
     # 새 캐릭터 확인 후 절전모드 전환
     success, message = go_to_sleep.go_to_sleep_and_huntingChk(
