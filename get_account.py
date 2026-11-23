@@ -89,13 +89,21 @@ def get_account_list(sio):
 
     account_dict[character_name] = hwnd
 
+    escKey()
+
+    # 새 캐릭터 확인 후 절전모드 전환
+    success, message = go_to_sleep.go_to_sleep_and_huntingChk(
+      "캐릭터 확인", character_name, sio
+    )
+
+    if not success:
+      return False, message
+
   # 가나다순 정렬
   sorted_dict = dict(sorted(account_dict.items(), key=lambda x: x[0]))
 
   # 변경된 경우에만 JSON 저장
   if sorted_dict != saved_accounts:
     utils.save_json("account.json", "config_json", sorted_dict)
-
-  go_to_sleep.go_to_sleep_and_huntingChk("캐릭터 확인", character_name, sio)
 
   return True, sorted_dict
