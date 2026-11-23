@@ -50,24 +50,28 @@ def get_account_list(sio):
     if hwnd in current_handles:
       account_dict[name] = hwnd 
 
-  # 캐릭터 이미지 폴더
-  accounts_dir = utils.file_path("", "image_files", "accounts")
-
-  # PNG 파일 목록 자동 생성
-  match_list = [
-    os.path.join("accounts", filename)
-    for filename in sorted(os.listdir(accounts_dir))
-    if filename.lower().endswith(".png")
+  # 새로 발견된 핸들만 추출
+  new_handles = [
+    hwnd for hwnd in lin_handles
+    if hwnd not in account_dict.values()
   ]
 
-  if not match_list:
-    return False, "캐릭터 이미지 파일 없음"
+  match_list = []
+
+  if new_handles:
+    accounts_dir = utils.file_path("", "image_files", "accounts")
+
+    match_list = [
+      os.path.join("accounts", filename)
+      for filename in sorted(os.listdir(accounts_dir))
+      if filename.lower().endswith(".png")
+    ]
+
+    if not match_list:
+      return False, "캐릭터 이미지 파일 없음"
 
   # 새로 발견된 핸들만 처리
-  for hwnd in lin_handles:
-    if hwnd in account_dict.values():
-      continue
-
+  for hwnd in new_handles:
     # 윈도우 활성화
     success, message = img_search_utils.getWindow(hwnd)
     if not success:
