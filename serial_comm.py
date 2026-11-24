@@ -2,6 +2,7 @@ import serial
 import time
 import random
 import utils
+from log_context import log_event
 
 ser = None
 
@@ -15,6 +16,7 @@ def connect_serial():
 
   try:
     if ser is None or not ser.is_open:
+      log_event("serial.connect", "START", port=cfg.get("serial_port"))
       ser = serial.Serial(
         cfg["serial_port"],
         cfg.get("serial_baudrate", 9600),
@@ -22,10 +24,12 @@ def connect_serial():
       )
       time.sleep(0.5)  # 아두이노 리셋 대기
       print("Serial connected")
+      log_event("serial.connect", "END", "SUCCESS")
 
     return True, "시리얼 연결 완료"
 
   except Exception as e:
+    log_event("serial.connect", "END", "ERROR", error=repr(e))
     ser = None
     raise ConnectionError(f"Serial connection failed: {e}") from e
 
@@ -37,7 +41,9 @@ def close_serial():
 
   try:
     if ser is not None and ser.is_open:
+      log_event("serial.close", "START")
       ser.close()
+      log_event("serial.close", "END", "SUCCESS")
 
     return True, "시리얼 연결 종료 완료"
 
@@ -50,26 +56,30 @@ def close_serial():
 def send_and_wait(cmd, timeout=3.0):
   global ser
 
-  connect_serial()
+  log_event("serial.send_and_wait", "START", cmd=cmd, timeout=timeout)
 
   try:
+    connect_serial()
     # 입력 버퍼 정리
     ser.reset_input_buffer()
 
     # 명령 전송
     ser.write((str(cmd) + "\n").encode("utf-8"))
     ser.flush()
+    log_event("serial.send_and_wait", "SENT", cmd=cmd)
 
     # ACK 대기
     start = time.monotonic()
     while time.monotonic() - start < timeout:
       line = ser.readline().decode(errors="ignore").strip()
       if line == "ACK":
+        log_event("serial.send_and_wait", "ACK", "COMMAND_COMPLETED", elapsed_ms=round((time.monotonic() - start) * 1000))
         return True, "ACK 수신"
 
     raise TimeoutError("Arduino ACK timeout")
 
-  except Exception:
+  except Exception as e:
+    log_event("serial.send_and_wait", "END", "ERROR", error=repr(e), cmd=cmd)
     # 통신 실패 시 연결 종료. 종료 과정의 오류가 원래 예외를 가리지 않도록 함.
     try:
       close_serial()
@@ -83,7 +93,9 @@ def execute_command(cmd, delay=0):
   success, message = send_and_wait(cmd)
 
   if delay > 0:
+    log_event("serial.execute_command", "WAIT_START", seconds=delay)
     time.sleep(delay)
+    log_event("serial.execute_command", "WAIT_END", seconds=delay)
 
   return success, message
 

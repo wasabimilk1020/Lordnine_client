@@ -15,6 +15,8 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 from PIL import ImageGrab,ImageEnhance,Image,ImageOps,ImageFilter
 import cv2
 import numpy as np 
+import logging
+from log_context import log_event
 from typing import Tuple, Optional
 
 
@@ -23,6 +25,9 @@ def searchImg(imgTitle, beforeDelay, afterDelay, justChk=False, coord=[], chkCnt
   full_path = utils.file_path(f"{imgTitle}", "image_files")
   chkInterval = 0.5
   loopCnt = 0
+  # auto_move_chk는 상위 대기 루프에서 횟수와 최종 결과를 요약 기록
+  level = logging.DEBUG if imgTitle == "auto_move_chk.png" else logging.INFO
+  log_event("searchImg", "START", level=level, image=imgTitle, max_checks=chkCnt, click=bool(coord) or not justChk)
 
   while loopCnt < chkCnt:
     loopCnt += 1
@@ -41,11 +46,13 @@ def searchImg(imgTitle, beforeDelay, afterDelay, justChk=False, coord=[], chkCnt
         randClick(coord[0], coord[1], coord[2], coord[3], 0)
       elif justChk:  # 클릭 없이 이미지 체크만 할 경우
         time.sleep(afterDelay)
+        log_event("searchImg", "END", "FOUND", level=level, image=imgTitle, checks=loopCnt, click=False)
         return True, result 
       else:  # 이미지 클릭
         randClick(result[0], result[1], result[2], result[3], 0)
 
       time.sleep(afterDelay)
+      log_event("searchImg", "END", "FOUND", level=level, image=imgTitle, checks=loopCnt, click=True)
       return True, result
 
     except pyautogui.ImageNotFoundException:
@@ -54,12 +61,15 @@ def searchImg(imgTitle, beforeDelay, afterDelay, justChk=False, coord=[], chkCnt
       continue
 
     except Exception as e:
+      log_event("searchImg", "END", "ERROR", logging.ERROR, image=imgTitle, checks=loopCnt, error=repr(e))
       raise RuntimeError(f"이미지 검색 오류 ({imgTitle}): {e}") from e
 
+  log_event("searchImg", "END", "NOT_FOUND", level=level, image=imgTitle, checks=loopCnt)
   return False, None
   
 
 def caputure_image(name,x,y,sio):
+  log_event("capture_image", "START", character=name, region=(x, y, 50, 30))
   full_path=utils.file_path(f"{name}.png","image_files","capture_img")  #file, folder, sub_folder
 
   time.sleep(0.2)
@@ -71,6 +81,7 @@ def caputure_image(name,x,y,sio):
   nowDatetime=now.strftime('%H:%M')
   data=[name, nowDatetime, captureImg] 
   sio.emit("captured_image",data)
+  log_event("capture_image", "END", "SENT", character=name)
 
 # def getWindow(handle):
 #   try:
@@ -89,6 +100,7 @@ def caputure_image(name,x,y,sio):
 #     raise RuntimeError(f"윈도우 오류: {e}") from e
 
 def getWindow(handle):
+  log_event("getWindow", "START", handle=handle)
   try:
     # 최소화된 창이면 복원
     if win32gui.IsIconic(handle):
@@ -106,12 +118,15 @@ def getWindow(handle):
         time.sleep(0.05)
 
       else:
+        log_event("getWindow", "END", "ACTIVATION_FAILED", handle=handle)
         return False, "윈도우 활성화 실패"
 
     startClick(850, 440, 100, 100, 0)
+    log_event("getWindow", "END", "SUCCESS", handle=handle)
     return True, "성공"
 
   except Exception as e:
+    log_event("getWindow", "END", "ERROR", logging.ERROR, handle=handle, error=repr(e))
     raise RuntimeError(f"윈도우 오류: {e}") from e
     
 
@@ -120,6 +135,7 @@ def getWindow(handle):
 # binary_value=130
 
 def capture_text_from_region(x, y, width, height, _config, binary_val):
+  log_event("capture_text_from_region", "START", region=(x, y, width, height))
   bbox = (x, y, x + width, y + height)
 
   try:
@@ -147,14 +163,18 @@ def capture_text_from_region(x, y, width, height, _config, binary_val):
     ).strip()
 
   except Exception as e:
+    log_event("capture_text_from_region", "END", "ERROR", logging.ERROR, error=repr(e))
     raise RuntimeError(f"OCR 처리 오류: {e}") from e
 
   if not text:
+    log_event("capture_text_from_region", "END", "NOT_FOUND")
     return False, "문자 인식 실패"
 
+  log_event("capture_text_from_region", "END", "FOUND", length=len(text))
   return True, text
 
 def preprocess_image(temp_imgTitle, output_path):  #이미지 전처리
+  log_event("preprocess_image", "START", image=temp_imgTitle)
   input_path=utils.file_path(f"{temp_imgTitle}","image_files")  #file, folder, sub_folder
   # 이미지 로드
   template_image = cv2.imread(input_path)
@@ -176,9 +196,12 @@ def preprocess_image(temp_imgTitle, output_path):  #이미지 전처리
   # )
   # 저장
   cv2.imwrite(output_path, sharpened)
+  log_event("preprocess_image", "END", "COMPLETED", path=output_path)
 
 
 def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75, chk_cnt=5):
+  level = logging.DEBUG if temp_img_list == ["hunting.png"] else logging.INFO
+  log_event("img_matchTemplate", "START", level=level, templates=len(temp_img_list), max_checks=chk_cnt)
 
   bbox = (x, y, x + width, y + height)
 
@@ -220,16 +243,19 @@ def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75, chk_c
       _, max_val, _, max_loc = cv2.minMaxLoc(result)
 
       if max_val >= confidence:
+        log_event("img_matchTemplate", "END", "FOUND", level=level, image=title, score=round(max_val, 3), checks=cnt + 1)
         return True, (title, max_val, max_loc)
 
     # 마지막 검사에서는 기다릴 필요 없음
     if cnt < chk_cnt - 1:
       time.sleep(0.5)
 
+  log_event("img_matchTemplate", "END", "NOT_FOUND", level=level, checks=chk_cnt)
   return False, None
 
 
 def find_hsv_center(x, y, width, height, lower, upper, min_area=300):
+    log_event("find_hsv_center", "START", region=(x, y, width, height), lower=lower, upper=upper)
 
     # 1. 캡처
     img = ImageGrab.grab(bbox=(x, y, x+width, y+height))
@@ -254,20 +280,24 @@ def find_hsv_center(x, y, width, height, lower, upper, min_area=300):
     )
 
     if not contours:
+      log_event("find_hsv_center", "END", "NOT_FOUND")
       return False, None
 
     # 6. 가장 큰 색상 영역
     cnt = max(contours, key=cv2.contourArea)
 
     if cv2.contourArea(cnt) < min_area:
+      log_event("find_hsv_center", "END", "NOT_FOUND")
       return False, None
 
     # 7. 중심 좌표
     M = cv2.moments(cnt)
     if M["m00"] == 0:
+      log_event("find_hsv_center", "END", "NOT_FOUND")
       return False, None
 
     cx = int(M["m10"] / M["m00"]) + x
     cy = int(M["m01"] / M["m00"]) + y
 
+    log_event("find_hsv_center", "END", "FOUND", x=cx, y=cy)
     return True, (cx, cy)

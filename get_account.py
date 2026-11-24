@@ -9,6 +9,7 @@ import waking_from_sleep
 import os
 import json
 import go_to_sleep
+from log_context import trace_step, log_event
 
 # 현재 실행중인 윈도우 핸들 목록 가져오기
 def get_lin2m_hwnd_list():
@@ -29,9 +30,11 @@ def get_lin2m_hwnd_list():
       lin2m_handle_list.append(hwnd)
   return lin2m_handle_list
 
+@trace_step
 def get_account_list(sio):
   account_dict = {}
   lin_handles = get_lin2m_hwnd_list()
+  log_event("get_account_list", "HANDLES", count=len(lin_handles))
 
   time.sleep(2) #바로 시작 되는것을 막기 위한 임시 조치
 
@@ -70,8 +73,11 @@ def get_account_list(sio):
     if not match_list:
       return False, "캐릭터 이미지 파일 없음"
 
+  log_event("get_account_list", "CACHE", saved=len(saved_accounts), reused=len(account_dict), new=len(new_handles))
+
   # 새로 발견된 핸들만 처리
   for hwnd in new_handles:
+    log_event("get_account_list", "NEW_HANDLE", handle=hwnd)
     # 윈도우 활성화
     success, message = img_search_utils.getWindow(hwnd)
     if not success:
@@ -100,6 +106,7 @@ def get_account_list(sio):
       return False, f"캐릭터 이름 중복: {character_name}"
 
     account_dict[character_name] = hwnd
+    log_event("get_account_list", "MATCHED", character=character_name, handle=hwnd, score=round(score, 3))
 
     keyboard('x') #설정 창 나가기
 
@@ -112,10 +119,11 @@ def get_account_list(sio):
       return False, message
 
   # 가나다순 정렬
-  sorted_dict = dict(sorted(account_dict.items(), key=lambda x: x[0]))
+  accounts = dict(sorted(account_dict.items(), key=lambda x: x[0]))
 
   # 변경된 경우에만 JSON 저장
-  if sorted_dict != saved_accounts:
-    utils.save_json("account.json", "config_json", sorted_dict)
+  if accounts != saved_accounts:
+    log_event("get_account_list", "CACHE_SAVE", count=len(accounts))
+    utils.save_json("account.json", "config_json", accounts)
 
-  return True, sorted_dict
+  return True, accounts

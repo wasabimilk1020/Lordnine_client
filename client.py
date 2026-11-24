@@ -20,11 +20,19 @@ import computer_restart
 import game_exe
 import img_search_utils
 import utils
-import connect_request
 import re
 import code_update
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # 로깅 설정
+# 로컬 상세 로그 파일 추가 (서버 알림과 별도)
+log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
+os.makedirs(log_dir, exist_ok=True)
+file_handler = logging.FileHandler(os.path.join(log_dir, "client.log"), encoding="utf-8") #FileHandler가 로그를 파일에 저장함 "client.log"
+file_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(file_handler)
+logging.info("event=CLIENT_START")
+
 last_pong_time = None # 마지막으로 pong을 받은 시간
 PONG_TIMEOUT = 20  # 초 (pong 응답 대기 시간)
 
@@ -44,10 +52,13 @@ def process_tasks():
       print("클라이언트 메인루프 시작")
       # 작업 실행
       func, args = task
+      logging.info("step=task_queue event=START func=%s pending=%s", func.__name__, task_queue.qsize())
       func(*args)
+      logging.info("step=task_queue event=END result=COMPLETED func=%s", func.__name__)
     except queue.Empty:
       continue  # 작업이 없으면 다시 대기
     except Exception as e:
+      logging.exception("step=task_queue event=ERROR")
       print(f"Error processing task: {e}")
     
 # 작업 처리 스레드 시작
@@ -89,7 +100,11 @@ def disconnect():
 @sio.event
 def reqAccount(data):
   global character_list   
-  success, result = get_account.get_account_list(sio)
+  try:
+    success, result = get_account.get_account_list(sio)
+  except Exception:
+    logging.exception("step=reqAccount event=ERROR")
+    raise
 
   if success:
     character_list = result
@@ -267,6 +282,3 @@ sio.wait()
 #주석 처리 할 것 처리해서 chatgpt에게 파일 올려 구조 파악하게 하자.
 #왜 그런진 모르겠는대 부활 루틴이 잘 안됨.
 
-
-#set_account 잘 되는대 문제가 접속 하자마자 되는 문제.
-#절전모드로 진입을 안함

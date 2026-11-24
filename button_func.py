@@ -7,40 +7,47 @@ from waking_from_sleep import *
 from go_to_sleep import *
 import win32gui
 import win32con
+from log_context import trace_step, log_event
 
+@trace_step
 def start_attack():
-    is_orange, _ = img_search_utils.find_hsv_center(
-        1749, 701, 41, 37,
-        lower=(14, 176, 60),
-        upper=(26, 249, 183),
-        min_area=300
-    )
+  is_orange, _ = img_search_utils.find_hsv_center(
+    1749, 701, 41, 37,
+    lower=(14, 176, 60),
+    upper=(26, 249, 183),
+    min_area=300
+  )
 
-    is_gray, _ = img_search_utils.find_hsv_center(
-        1753, 692, 56, 59,
-        lower=(0, 0, 0),
-        upper=(179, 79, 61),
-        min_area=300
-    )
+  is_gray, _ = img_search_utils.find_hsv_center(
+    1753, 692, 56, 59,
+    lower=(0, 0, 0),
+    upper=(179, 79, 61),
+    min_area=300
+  )
 
-    if is_orange and not is_gray:
-        return True, "이미 공격 중"
+  log_event("start_attack", "STATE", orange=is_orange, gray=is_gray)
 
-    elif not is_orange and is_gray:
-        randClick(1760, 720, 5, 5, 1)
-        return True, "공격 버튼 클릭 완료"
+  if is_orange and not is_gray:
+    return True, "이미 공격 중"
 
-    elif not is_orange and not is_gray:
-        return False, "공격 버튼 상태 확인 실패"
+  elif not is_orange and is_gray:
+    log_event("start_attack", "ACTION", "CLICK_REQUESTED")
+    randClick(1760, 720, 5, 5, 1)
+    return True, "공격 버튼 클릭 완료"
 
-    else:
-        return False, "공격 버튼 상태 충돌"
+  elif not is_orange and not is_gray:
+    return False, "공격 버튼 상태 확인 실패"
+
+  else:
+    return False, "공격 버튼 상태 충돌"
 
 
 
+@trace_step
 def move_on_map(x, y, width=3, height=3, delay=1):
   # ===== 지도 열기 (최대 2번 시도) =====
   for attempt in range(2):
+    log_event('move_on_map', 'OPEN_ATTEMPT', attempt=attempt + 1)
     keyboard('m')
 
     # 지도 UI 확인 1
@@ -78,9 +85,11 @@ def move_on_map(x, y, width=3, height=3, delay=1):
       return False, "지도 열기 실패"
 
   # ===== 지도에서 위치 클릭 =====
+  log_event("move_on_map", "ACTION", "CLICK_REQUESTED", x=x, y=y, width=width, height=height)
   randClick(x, y, width, height, delay)
 
   # ===== 지도 닫기 =====
+  log_event("move_on_map", "CLOSE_ATTEMPT", attempt=1)
   escKey()
 
   # 최대 2번 닫힘 상태 확인
@@ -105,6 +114,7 @@ def move_on_map(x, y, width=3, height=3, delay=1):
     # 지도가 여전히 열려 있으면 ESC 재시도
     if map_success:
       if attempt == 0:
+        log_event("move_on_map", "CLOSE_ATTEMPT", attempt=2)
         escKey()
         continue
 
@@ -127,6 +137,7 @@ def move_on_map(x, y, width=3, height=3, delay=1):
 
 
 # data=[1142, 375, 10, 10, 0.0]=[x,y,xRange,yRange,delay]
+@trace_step
 def statusChk(sio, data, btn_name, character_name, handle):
   coord = data
   delay = data[4]
@@ -143,6 +154,7 @@ def statusChk(sio, data, btn_name, character_name, handle):
     return True, {"action": "status", "message": hunting_status}
 
 
+@trace_step
 def normalHunting(sio, data, btn_name, character_name, handle):
   coord=data
   flag=data[4]
@@ -192,10 +204,12 @@ def normalHunting(sio, data, btn_name, character_name, handle):
   if not success:
     return False, {"message": message}
 
+  log_event("auto_move_wait", "WAIT_START", image="auto_move_chk.png", max_checks=50)
   for i in range(50):
     success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
     if not success:
       break
+  log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED" if success else "NOT_FOUND", checks=i + 1)
 
   #공격
   success, message = start_attack()
@@ -225,6 +239,7 @@ def postBox(sio, data,btn_name, character_name, handle):
 
 
 #---------던전---------#
+@trace_step
 def dungeon(sio, data, btn_name, character_name, handle):
   coord=data
   charging=data[4]
@@ -255,10 +270,12 @@ def dungeon(sio, data, btn_name, character_name, handle):
     if not success:
       return False, {"message": message}
 
+    log_event("auto_move_wait", "WAIT_START", image="auto_move_chk.png", max_checks=50)
     for i in range(50):
       success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
       if not success:
         break
+    log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED" if success else "NOT_FOUND", checks=i + 1)
 
     #공격
     success, message = start_attack()
@@ -290,10 +307,12 @@ def dungeon(sio, data, btn_name, character_name, handle):
     if not success:
       return False, {"message": message}
 
+    log_event("auto_move_wait", "WAIT_START", image="auto_move_chk.png", max_checks=50)
     for i in range(50):
       success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
       if not success:
         break
+    log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED" if success else "NOT_FOUND", checks=i + 1)
 
     #공격
     success, message = start_attack()
@@ -388,10 +407,12 @@ def dungeon(sio, data, btn_name, character_name, handle):
     if not success:
       return False, {"message": message}
 
+    log_event("auto_move_wait", "WAIT_START", image="auto_move_chk.png", max_checks=50)
     for i in range(50):
       success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
       if not success:
         break
+    log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED" if success else "NOT_FOUND", checks=i + 1)
 
     #공격
     success, message = start_attack()
@@ -439,6 +460,7 @@ def switch_get_item(sio, data, btn_name, character_name, handle):
   # escKey()  #나가기
   # return 1, "message:None"
 
+@trace_step
 def decomposeItem(sio, data,btn_name, character_name, handle):
   coord=data
   delay=data[4]
@@ -496,6 +518,7 @@ def deathChk(sio, data,btn_name, character_name, handle):
   # return 1, "message:None"
 
 
+@trace_step
 def showDiamond(sio, data, btn_name, character_name, handle):
   coord = data
   delay = data[4]
@@ -716,6 +739,7 @@ def event_store(sio, data,btn_name, character_name, handle):
 
 
 #거리 10M
+@trace_step
 def ten_meter(sio, data, btn_name, character_name, handle):
   coord=data
   delay=data[4]
@@ -736,6 +760,7 @@ def ten_meter(sio, data, btn_name, character_name, handle):
 
 
 #거리 제한없음
+@trace_step
 def unlimit(sio, data, btn_name, character_name, handle):
   coord=data
   delay=data[4]
@@ -857,6 +882,7 @@ def unlimit(sio, data, btn_name, character_name, handle):
 #   return 1, "message:None"
 
 #------------모닝 루틴------------#
+@trace_step
 def morning(sio, data,btn_name, character_name, handle):
   coord=data
   delay=data[4]
@@ -926,7 +952,7 @@ def morning(sio, data,btn_name, character_name, handle):
   randClick(1110,595,5,5,1) #max
   success, _ =img_search_utils.searchImg('buy.png', beforeDelay=0, afterDelay=1, _region=(970,745,300,200))
   if not success:
-    return False, {"message": "구매 실패"}
+    return False, {"message": "룬 구매 실패"}
 
   escKey()
   time.sleep(1)
