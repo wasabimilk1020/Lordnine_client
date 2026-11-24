@@ -145,7 +145,7 @@ def statusChk(sio, data, btn_name, character_name, handle):
 
   success, hunting_status = check_hunting.checkHunting()
 
-  if not success:  # 사냥 중이 아님
+  if not success or hunting_status == "rest":  # 사냥 중이 아니거나 휴식 중
     waking_from_sleep_and_deathChk(sleep_time=2)
     result = normalHunting(sio, data, btn_name, character_name, handle)
     return result

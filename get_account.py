@@ -35,7 +35,7 @@ def get_account_list(sio):
   account_dict = {}
   lin_handles = get_lin2m_hwnd_list()
   log_event("get_account_list", "HANDLES", count=len(lin_handles))
-
+  print("핸들 값", lin_handles)
   time.sleep(2) #바로 시작 되는것을 막기 위한 임시 조치
 
   if not lin_handles:
@@ -45,17 +45,17 @@ def get_account_list(sio):
   saved_accounts = utils.load_json("account.json", "config_json")
 
   # 현재 존재하는 게임 핸들만 유지
-  current_handles = set(lin_handles)
+  current_handles = lin_handles
 
-  for name, hwnd in saved_accounts.items():
-    hwnd = int(hwnd)
+  for name, saved_hwnd in saved_accounts.items():
+    saved_hwnd = int(saved_hwnd)
 
-    if hwnd in current_handles:
-      account_dict[name] = hwnd 
+    if saved_hwnd in current_handles:
+      account_dict[name] = saved_hwnd 
 
   # 새로 발견된 핸들만 추출
   new_handles = [
-    hwnd for hwnd in lin_handles
+    hwnd for hwnd in current_handles
     if hwnd not in account_dict.values()
   ]
 
@@ -97,7 +97,7 @@ def get_account_list(sio):
     if not success:
       return False, f"캐릭터 이름 매칭 실패: {hwnd}"
 
-    # 매칭된 파일명에서 캐릭터 이름 추출
+    # new_handle에서 매칭된 파일명에서 캐릭터 이름 추출
     title, score, location = match_data
     character_name = os.path.splitext(os.path.basename(title))[0]
 

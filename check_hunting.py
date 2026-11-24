@@ -5,7 +5,7 @@ from log_context import trace_step, log_event
 
 x, y, width, height = 835, 700, 250, 150
 
-match_list = ["hunting.png"]
+match_list = ["hunting.png", "rest.png"]
 
 @trace_step
 def checkHunting():

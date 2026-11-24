@@ -19,7 +19,7 @@ _run_counter = count(1)
 def mainLoop(sio, btn_func, func_data, id_handle, btn_name):
   for character_name, handle in id_handle:
     run_id = next(_run_counter)
-    set_context(run_id, character_name, handle, btn_name)
+    set_context(run_id, character_name, handle, btn_name) #threading.local()에 변수 할당. 
     logging.info(
       "run=%s char=%s handle=%s routine=%s event=START",
       run_id, character_name, handle, btn_name

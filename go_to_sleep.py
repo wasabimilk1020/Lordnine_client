@@ -13,35 +13,33 @@ def go_to_sleep_and_huntingChk(btn_name, character_name, sio, check_status=False
 
   # 절전모드 진입 확인
   for i in range(3):
-    success, _ = img_search_utils.searchImg(
-      'sleepChk.png',
-      beforeDelay=1,
-      afterDelay=0,
-      justChk=True,
-      _region=(811, 638, 299, 232)
-    )
+    success, hunting_status = check_hunting.checkHunting()
 
     if success:
       break
   else:
-    log_event("sleep_verify", "END", "NOT_FOUND", image="sleepChk.png", checks=3)
+    log_event(
+      "sleep_verify",
+      "END",
+      "NOT_FOUND",
+      checks=3
+    )
     message = f"{btn_name} 절전모드 진입 실패"
     sio.emit("logEvent", [message, character_name, ERR_MSG])
     return False, message
 
-  log_event("sleep_verify", "END", "FOUND", image="sleepChk.png", checks=i + 1)
+  log_event(
+    "sleep_verify",
+    "END",
+    "FOUND",
+    checks=i + 1,
+    status=hunting_status
+  )
 
-  # 필요한 경우 사냥 상태 추가 확인
+  # check_status는 현재 구조상 필수는 아니지만
+  # 기존 호출부 호환성을 위해 남겨 둠
   if check_status:
-    success, hunting_status = check_hunting.checkHunting()
-
-    if not success:
-      message = f"{btn_name}, {hunting_status}"
-      sio.emit("logEvent", [message, character_name, ERR_MSG])
-      return False, message
-
     message = f"{btn_name}, {hunting_status} 완료"
-
   else:
     message = f"{btn_name} 완료"
 

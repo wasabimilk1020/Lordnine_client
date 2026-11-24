@@ -284,3 +284,14 @@ sio.wait()
 
 # 1. 아두이노 명령 루틴에서 오류가 자주 발생 하는듯. 즉, 아두이노 자체는 실행 됬는대 게임에서 명령이 씹히는듯...
 # 2. 아니면 사망 상태에서 실패 한건대 recover.png를 클릭 한 후 너무 짧은 주기 후 바로 던전 진입을 해서 그런가?
+# 이건 원인이 부활하기 하고 한 참 걸리는 때가 있음. 임시로 딜레이를 더 주고 확실하게는 부활 됬는지 이미지 체크하자.
+
+
+
+# 3. 이동 체크 실패 뜨고 사냥터 포탈에 멈춤
+# 4. 아래 코드 부분에서 템플릿 매칭이 되지 않음. 왜지? 아직 chk.png가 뜨기 전이라서? 아니면 떳는대도 실패 했나?
+#  match_list=["chk.png"]
+  # success, match_data=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
+  # if not success:
+  #   return False, {"message": "이동 체크 실패"}
+  # time.sleep(2)
