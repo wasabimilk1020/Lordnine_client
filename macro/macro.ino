@@ -10,8 +10,8 @@ char input_data[5][21];
 int idx = 0;
 
 // 클릭 및 키보드 딜레이
-#define CLICK_HOLD_MS 25
-#define KEY_HOLD_MS   30
+#define CLICK_HOLD_MS 50
+#define KEY_HOLD_MS   50
 #define KEY_GAP_MS    10
 
 void setup() {
@@ -87,12 +87,12 @@ void sendAck() {
 }
 
 // -------------------- 키보드 문자열 입력 --------------------
-void typeString(const char* str) {
+void typeString(const char* str, unsigned long holdMs) {
     for (int i = 0; str[i] != '\0'; i++) {
         char c = str[i];
 
         Keyboard.press(c);
-        delay(KEY_HOLD_MS);
+        delay(holdMs);
 
         Keyboard.release(c);
         delay(KEY_GAP_MS);
@@ -141,11 +141,18 @@ void handleCommand() {
         sendAck();
     }
 
-    // 3: 키보드 문자열 입력 (최대 20글자)
+    // 3: 키보드 문자열 입력
     else if (strcmp(input_data[0], "3") == 0) {
-        typeString(input_data[1]);
-
-        // 명령 처리 완료
+        unsigned long holdMs = KEY_HOLD_MS;
+    
+        if (idx >= 3) {
+            long requested = atol(input_data[2]);
+            if (requested > 0) {
+                holdMs = (unsigned long)requested;
+            }
+        }
+    
+        typeString(input_data[1], holdMs);
         sendAck();
     }
 

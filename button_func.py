@@ -33,7 +33,7 @@ def start_attack():
   elif not is_orange and is_gray:
     log_event("start_attack", "ACTION", "CLICK_REQUESTED")
     randClick(1760, 720, 5, 5, 1)
-  
+
     # 클릭 후 공격 상태 재확인
     attack_success, _ = img_search_utils.find_hsv_center(
       1749, 701, 41, 37,
@@ -41,15 +41,15 @@ def start_attack():
       upper=(26, 249, 183),
       min_area=300
     )
-  
+
     log_event(
       "start_attack", "STATE",
       "ATTACK_STARTED" if attack_success else "ATTACK_NOT_STARTED"
     )
-  
+
     if not attack_success:
       return False, "공격 활성화 실패"
-  
+
     return True, "공격 활성화 확인 완료"
 
   elif not is_orange and not is_gray:
@@ -447,9 +447,38 @@ def world_boss(sio, data, btn_name, character_name, handle):
   charging=data[4]
   name=character_name
 
-  #여기에 루틴 만들어 줘야함.
+  randClick(1845,60,10,10,1)  #메뉴 클릭
+  success, match_data=img_search_utils.searchImg('boss_menu.png', beforeDelay=0, afterDelay=1, _region=(1350, 120, 550, 680))
+  if not success:
+    return False, {"message": "보스 메뉴 실패"}
+  
+  success, match_data=img_search_utils.searchImg('boss_destroyer.png', beforeDelay=0, afterDelay=2, _region=(130, 6, 900, 226))
+  if not success:
+    return False, {"message": "파괴자 실패"}
+
+  randClick(710,775,5,5,3)  #파괴자 위치 (라탄)
+
+  randClick(1735,990,10,10,1) #빠른이동
+  success, _ = img_search_utils.searchImg('confirm.png', beforeDelay=0, afterDelay=80, _region=(985,575,300,200))
+  if not success:
+    return False, {"message": "확인 실패"}
+
+  log_event("auto_move_wait", "WAIT_START", image="auto_move_chk.png", max_checks=10)
+  for i in range(10):
+    success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
+    if not success:
+      break
+  log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED" if success else "NOT_FOUND", checks=i + 1)
+
+  keyboard('w',4000)  #앞으로 4초간 이동
+  
+  #공격
+  success, message = start_attack()
+  if not success:
+    return False, {"message": message}
 
   img_search_utils.caputure_image(name, 180, 170, sio) #name, x, y, sio
+  
   
   return True, {"action": "sleep", "message": "message:None"}
 

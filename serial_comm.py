@@ -2,6 +2,7 @@ import serial
 import time
 import random
 import utils
+import logging
 from log_context import log_event
 
 ser = None
@@ -29,7 +30,7 @@ def connect_serial():
     return True, "시리얼 연결 완료"
 
   except Exception as e:
-    log_event("serial.connect", "END", "ERROR", error=repr(e))
+    log_event("serial.connect", "END", "ERROR", level=logging.ERROR, error=repr(e))
     ser = None
     raise ConnectionError(f"Serial connection failed: {e}") from e
 
@@ -79,7 +80,7 @@ def send_and_wait(cmd, timeout=3.0):
     raise TimeoutError("Arduino ACK timeout")
 
   except Exception as e:
-    log_event("serial.send_and_wait", "END", "ERROR", error=repr(e), cmd=cmd)
+    log_event("serial.send_and_wait", "END", "ERROR", level=logging.ERROR, error=repr(e), cmd=cmd)
     # 통신 실패 시 연결 종료. 종료 과정의 오류가 원래 예외를 가리지 않도록 함.
     try:
       close_serial()
@@ -89,8 +90,8 @@ def send_and_wait(cmd, timeout=3.0):
 
 # 공통 명령 실행
 # 정상: (True, 메시지) / 예외: 상위 함수로 전달
-def execute_command(cmd, delay=0):
-  success, message = send_and_wait(cmd)
+def execute_command(cmd, delay=0, timeout=3.0):
+  success, message = send_and_wait(cmd, timeout=timeout)
 
   if delay > 0:
     log_event("serial.execute_command", "WAIT_START", seconds=delay)
@@ -148,18 +149,27 @@ def mouseDrag(dragValues):
 
 
 # 키보드 입력 (명령 3)
-def keyboard(input):
-  val = f'3!{input}'
-  return execute_command(val)
+def keyboard(input, hold_ms=None):
+  if hold_ms is None:
+    val = f'3!{input}'
+  else:
+    if not isinstance(hold_ms, int) or isinstance(hold_ms, bool) or hold_ms <= 0:
+      raise ValueError("hold_ms는 양의 정수여야 함")
+    val = f'3!{input}!{hold_ms}'
+
+  duration_ms = hold_ms if hold_ms is not None else 50
+  timeout = max(3.0, len(input) * (duration_ms + 10) / 1000 + 2.0)
+
+  return execute_command(val, timeout=timeout)
 
 
 # 첫 마우스 사용 시 (명령 5)
-def startClick(xVal, yVal, xRange, yRange, clkSleep):
+def startClick(xVal, yVal, xRange, yRange, clkSleep=0):
   randX = random_position(xVal, xRange)
   randY = random_position(yVal, yRange)
 
   val = f'5!{randX}!{randY}'
-  return execute_command(val)
+  return execute_command(val, clkSleep)
 
 
 # ENTER (명령 6)
