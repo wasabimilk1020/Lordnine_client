@@ -121,53 +121,14 @@ button_mapping={
   "수련의전당":button_func.dungeon,
   "안타라스":button_func.dungeon,
   "상아탑":button_func.dungeon,
-  "여명의사원":button_func.dungeon,
-  "운디네사원":button_func.dungeon,
   "이벤트던전":button_func.dungeon,
   "모닝":button_func.morning,
   "우편":button_func.postBox,
-  "시즌패스":button_func.seasonpass,
   "아이템분해":button_func.decomposeItem,
-  "스킬북분해":button_func.decomposeBook,
-  "아이템삭제":button_func.itemDelete,
-  "일괄사용":button_func.useItem,
-  "사망체크":button_func.deathChk,
-  "신탁서":button_func.paper,
-  "이벤트상점":button_func.event_store,
-  "아가시온":button_func.agasion,
-  "모두":button_func.switch_get_item,
-  "고급":button_func.switch_get_item,
-  "희귀":button_func.switch_get_item,
   "10M":button_func.ten_meter,
   "제한없음":button_func.unlimit,
-  # "바람":button_func.decomposeItem,
-  # "불":button_func.decomposeItem,
-  # "물":button_func.decomposeItem,
-  "다이아":button_func.showDiamond,
-  "제작":button_func.make_item,
-  "파던입장":button_func.party_dun_entry,
-  "파티해제":button_func.unparty,
-  "귀환":button_func.go_home,
-  "봉인사원":button_func.party_dungeon,
-  "카이트해적":button_func.party_dungeon,
-  "네뷸라이트":button_func.party_dungeon,
-  "회색제단":button_func.party_dungeon,
-  "최후정원":button_func.party_dungeon,
-  "케트라":button_func.party_dungeon,
-  "클래스합성":button_func.class_add,
-  "아가합성":button_func.aga_add,
-  "거래소":button_func.item_exchange,
-  "재등록":button_func.re_exchange,
-  "정산":button_func.get_exchange,
-  "마력잉크":button_func.magic_ink,
+  "다이아":button_func.showDiamond, 
   "창정렬":button_func.move_window,
-  "실행광고":button_func.gameExe_adRemove,
-  "상자열기":button_func.open_box,
-  "힐OFF":button_func.heal_off,
-  "힐ON":button_func.heal_on,
-  "펫가호":button_func.petGaho,
-
- 
 }
 
 @sio.event
@@ -282,16 +243,18 @@ sio.wait()
 #주석 처리 할 것 처리해서 chatgpt에게 파일 올려 구조 파악하게 하자.
 #왜 그런진 모르겠는대 부활 루틴이 잘 안됨.
 
-# 1. 아두이노 명령 루틴에서 오류가 자주 발생 하는듯. 즉, 아두이노 자체는 실행 됬는대 게임에서 명령이 씹히는듯...
-# 2. 아니면 사망 상태에서 실패 한건대 recover.png를 클릭 한 후 너무 짧은 주기 후 바로 던전 진입을 해서 그런가?
+# 문제 1.
+# 사망 상태에서 실패 한건대 recover.png를 클릭 한 후 너무 짧은 주기 후 바로 던전 진입을 해서 그런가?
 # 이건 원인이 부활하기 하고 한 참 걸리는 때가 있음. 임시로 딜레이를 더 주고 확실하게는 부활 됬는지 이미지 체크하자. 임시로 딜레이 7초줌
 
 
-
-# 3. 이동 체크 실패 뜨고 사냥터 포탈에 멈춤
-# 4. 아래 코드 부분에서 템플릿 매칭이 되지 않음. 왜지? 아직 chk.png가 뜨기 전이라서? 아니면 떳는대도 실패 했나?
+# 문제 2. 
+# 이동 체크 실패 뜨고 사냥터 포탈에 멈춤
+# 아래 코드 부분에서 템플릿 매칭이 되지 않음. 왜지? 아직 chk.png가 뜨기 전이라서? 아니면 떳는대도 실패 했나?
 #  match_list=["chk.png"]
   # success, match_data=img_search_utils.img_matchTemplate(match_list, 1669, 0, 229, 180)
   # if not success:
   #   return False, {"message": "이동 체크 실패"}
   # time.sleep(2)
+
+
