@@ -129,6 +129,7 @@ button_mapping={
   "제한없음":button_func.unlimit,
   "다이아":button_func.showDiamond, 
   "창정렬":button_func.move_window,
+  "라탄":button_func.world_boss,
 }
 
 @sio.event
@@ -257,4 +258,6 @@ sio.wait()
   #   return False, {"message": "이동 체크 실패"}
   # time.sleep(2)
 
-
+# 문제 3.
+# death.png가 체크 되서 recover가 실행 됬는대 이게 실패 할 일이 뭐가 있지?
+# 화면은 부활하기 상태에서 부활하기가 안눌린 상태였음.

@@ -109,7 +109,8 @@ void handleCommand() {
 
         MouseTo.setTarget(x, y, false);
         while (!MouseTo.move()) {}
-
+    
+        delay(50);  // 이동 완료 후 50ms 대기
         Mouse.press(MOUSE_LEFT);
         delay(CLICK_HOLD_MS);
         Mouse.release(MOUSE_LEFT);
