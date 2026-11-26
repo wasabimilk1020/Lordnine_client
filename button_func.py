@@ -645,7 +645,7 @@ def astra_on(sio, data, btn_name, character_name, handle):
   name=character_name
 
   randClick(1840,320,5,5,2) #아스트라 클릭
-  success, _ =img_search_utils.searchImg('astra_on.png', beforeDelay=0, afterDelay=0, _region=(986, 686, 237, 227))
+  success, _ =img_search_utils.searchImg('astra_on.png', beforeDelay=0, afterDelay=2, _region=(986, 686, 237, 227))
   if not success:
       return False, {"message": "아스트라 on 실패"}
   escKey()
@@ -661,7 +661,7 @@ def astra_off(sio, data, btn_name, character_name, handle):
   name=character_name
 
   randClick(1840,320,5,5,2) #아스트라 클릭
-  success, _ =img_search_utils.searchImg('astra_off.png', beforeDelay=0, afterDelay=1, _region=(984, 688, 239, 224))
+  success, _ =img_search_utils.searchImg('astra_off.png', beforeDelay=0, afterDelay=2, _region=(984, 688, 239, 224))
   if not success:
       return False, {"message": "아스트라 off 실패"}
   escKey()
