@@ -114,7 +114,7 @@ def move_on_map(x, y, width=3, height=3, delay=1, move_max_checks=50, move_check
   )
   randClick(x, y, width, height, delay)
 
-  success, match_data = img_search_utils.img_matchTemplate(["map_clicked.png"], x-50, y-50, 100, 100, confidence=0.70, gray=True) #좌표 클릭 확인
+  success, match_data = img_search_utils.img_matchTemplate(["map_clicked.png"], x-50, y-50, 100, 100, confidence=0.60, gray=True) #좌표 클릭 확인
   print("좌표 클릭:", match_data)
   if not success:
     return False, "좌표 클릭 실패"
