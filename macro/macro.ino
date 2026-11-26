@@ -10,8 +10,8 @@ char input_data[5][21];
 int idx = 0;
 
 // 클릭 및 키보드 딜레이
-#define CLICK_HOLD_MS 50
-#define KEY_HOLD_MS   50
+#define CLICK_HOLD_MS 70
+#define KEY_HOLD_MS   70
 #define KEY_GAP_MS    10
 
 void setup() {

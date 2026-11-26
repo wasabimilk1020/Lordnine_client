@@ -173,38 +173,38 @@ def move_on_map(x, y, width=3, height=3, delay=1, move_max_checks=50, move_check
     return False, "지도 닫기 실패"
 
   # ===== 자동 이동 완료 대기 =====
+  return wait_auto_move(max_checks=move_max_checks, check_delay=move_check_delay)
+
+@trace_step
+def wait_auto_move(max_checks=50, check_delay=1):
+  if not isinstance(max_checks, int) or isinstance(max_checks, bool) or max_checks <= 0:
+    raise ValueError("max_checks는 양의 정수여야 함")
+
+  if not isinstance(check_delay, (int, float)) or isinstance(check_delay, bool) or check_delay < 0:
+    raise ValueError("check_delay는 0 이상의 숫자여야 함")
+
   log_event(
     "auto_move_wait", "WAIT_START",
     image="auto_move_chk.png",
-    max_checks=move_max_checks,
-    check_delay=move_check_delay
+    max_checks=max_checks,
+    check_delay=check_delay
   )
 
-  for i in range(move_max_checks):
+  for i in range(max_checks):
     success, _ = img_search_utils.searchImg(
       'auto_move_chk.png',
       beforeDelay=0,
-      afterDelay=move_check_delay,
+      afterDelay=check_delay,
       justChk=True,
       _region=(830, 600, 300, 150)
     )
 
-    # 이동 중 표시가 사라지면 이동 완료로 판단
     if not success:
-      break
+      log_event("auto_move_wait", "WAIT_END", "NOT_FOUND", checks=i + 1)
+      return True, "자동 이동 완료"
 
-  log_event(
-    "auto_move_wait", "WAIT_END",
-    "LIMIT_REACHED" if success else "NOT_FOUND",
-    checks=i + 1,
-    max_checks=move_max_checks
-  )
-
-  if success:
-    return False, "자동 이동 완료 확인 실패 (최대 검사 횟수 초과)"
-
-  return True, "지도 이동 완료"
-
+  log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED", checks=max_checks)
+  return False, "자동 이동 완료 확인 실패 (최대 검사 횟수 초과)"
 
 
 # data=[1142, 375, 10, 10, 0.0]=[x,y,xRange,yRange,delay]
@@ -284,9 +284,6 @@ def normalHunting(sio, data, btn_name, character_name, handle):
 
   return True, {"action": "sleep", "message":"사냥 루틴 완료"}
 
-
-
-
 def postBox(sio, data,btn_name, character_name, handle):
   pass
   # keyboard(',')
@@ -334,13 +331,6 @@ def dungeon(sio, data, btn_name, character_name, handle):
     if not success:
       return False, {"message": message}
 
-    log_event("auto_move_wait", "WAIT_START", image="auto_move_chk.png", max_checks=50)
-    for i in range(50):
-      success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
-      if not success:
-        break
-    log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED" if success else "NOT_FOUND", checks=i + 1)
-
     #공격
     success, message = start_attack()
     if not success:
@@ -370,13 +360,6 @@ def dungeon(sio, data, btn_name, character_name, handle):
     success, message = move_on_map(900,490,3,3,1)
     if not success:
       return False, {"message": message}
-
-    log_event("auto_move_wait", "WAIT_START", image="auto_move_chk.png", max_checks=50)
-    for i in range(50):
-      success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
-      if not success:
-        break
-    log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED" if success else "NOT_FOUND", checks=i + 1)
 
     #공격
     success, message = start_attack()
@@ -471,13 +454,6 @@ def dungeon(sio, data, btn_name, character_name, handle):
     if not success:
       return False, {"message": message}
 
-    log_event("auto_move_wait", "WAIT_START", image="auto_move_chk.png", max_checks=50)
-    for i in range(50):
-      success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
-      if not success:
-        break
-    log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED" if success else "NOT_FOUND", checks=i + 1)
-
     #공격
     success, message = start_attack()
     if not success:
@@ -510,12 +486,9 @@ def world_boss(sio, data, btn_name, character_name, handle):
   if not success:
     return False, {"message": "확인 실패"}
 
-  log_event("auto_move_wait", "WAIT_START", image="auto_move_chk.png", max_checks=10)
-  for i in range(10):
-    success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
-    if not success:
-      break
-  log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED" if success else "NOT_FOUND", checks=i + 1)
+  success, message =wait_auto_move(max_checks=10, check_delay=1)
+  if not success:
+      return False, {"message": message}
 
   keyboard('w',4000)  #앞으로 4초간 이동
 
