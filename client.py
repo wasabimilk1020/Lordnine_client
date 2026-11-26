@@ -130,6 +130,9 @@ button_mapping={
   "다이아":button_func.showDiamond, 
   "창정렬":button_func.move_window,
   "라탄":button_func.world_boss,
+  "포션":button_func.portions,
+  "아스트라on":button_func.astra_on,
+  "아스트라off":button_func.astra_off,
 }
 
 @sio.event
@@ -244,6 +247,8 @@ sio.wait()
 #주석 처리 할 것 처리해서 chatgpt에게 파일 올려 구조 파악하게 하자.
 #왜 그런진 모르겠는대 부활 루틴이 잘 안됨.
 
+# 물약 먹는 것과 아스트라 활성화 루틴 만들어야함
+
 # 문제 1.
 # 사망 상태에서 실패 한건대 recover.png를 클릭 한 후 너무 짧은 주기 후 바로 던전 진입을 해서 그런가?
 # 이건 원인이 부활하기 하고 한 참 걸리는 때가 있음. 임시로 딜레이를 더 주고 확실하게는 부활 됬는지 이미지 체크하자. 임시로 딜레이 7초줌
@@ -261,3 +266,4 @@ sio.wait()
 # 문제 3.
 # death.png가 체크 되서 recover가 실행 됬는대 이게 실패 할 일이 뭐가 있지?
 # 화면은 부활하기 상태에서 부활하기가 안눌린 상태였음.
+

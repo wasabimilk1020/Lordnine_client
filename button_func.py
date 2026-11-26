@@ -582,8 +582,6 @@ def showDiamond(sio, data, btn_name, character_name, handle):
   return True, {"action": "sleep", "message": "다이아 확인 완료"}
 
 
-
-
 #거리 10M
 @trace_step
 def ten_meter(sio, data, btn_name, character_name, handle):
@@ -625,6 +623,50 @@ def unlimit(sio, data, btn_name, character_name, handle):
 
   return True, {"action": "sleep", "message": "message:None"}
 
+@trace_step
+def portions(sio, data, btn_name, character_name, handle):
+  coord=data
+  delay=data[4]
+  name=character_name
+
+  for i in range(6):
+    num_input=str(i+1)
+    keyboard(num_input)
+    time.sleep(2)
+
+  img_search_utils.caputure_image(name, 1765, 290, sio) #name, x, y, sio
+
+  return True, {"action": "sleep", "message": "message:None"}
+
+@trace_step
+def astra_on(sio, data, btn_name, character_name, handle):
+  coord=data
+  delay=data[4]
+  name=character_name
+
+  randClick(1840,320,5,5,2) #아스트라 클릭
+  success, _ =img_search_utils.searchImg('astra_on.png', beforeDelay=0, afterDelay=0, _region=(986, 686, 237, 227))
+  if not success:
+      return False, {"message": "아스트라 on 실패"}
+  
+  img_search_utils.caputure_image(name, 1765, 290, sio) #name, x, y, sio
+
+  return True, {"action": "sleep", "message": "message:None"}
+
+@trace_step
+def astra_off(sio, data, btn_name, character_name, handle):
+  coord=data
+  delay=data[4]
+  name=character_name
+
+  randClick(1840,320,5,5,2) #아스트라 클릭
+  success, _ =img_search_utils.searchImg('astra_off.png', beforeDelay=0, afterDelay=1, _region=(984, 688, 239, 224))
+  if not success:
+      return False, {"message": "아스트라 off 실패"}
+  
+  img_search_utils.caputure_image(name, 1765, 290, sio) #name, x, y, sio
+
+  return True, {"action": "sleep", "message": "message:None"}
 
 # #데일리 출석 루틴
 # def daily(sio, data,btn_name, character_name, handle):
@@ -753,7 +795,10 @@ def morning(sio, data,btn_name, character_name, handle):
 
   #--상점
   keyboard('u') #상점
-  time.sleep(3)
+  time.sleep(5)
+  success, _ =img_search_utils.searchImg('store_chk.png', beforeDelay=0, afterDelay=0, justChk=True, _region=(357, 0, 432, 245))
+  if not success:
+    return False, {"message": "상점 진입 실패"} 
   spaceKey()
   time.sleep(2)
   spaceKey()
