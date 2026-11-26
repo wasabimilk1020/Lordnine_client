@@ -181,25 +181,26 @@ def preprocess_image(temp_imgTitle, output_path):  #이미지 전처리
   
   # 1. 그레이스케일
   gray = cv2.cvtColor(template_image, cv2.COLOR_BGR2GRAY)
-  # 2. 대비 향상 (CLAHE)
-  clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-  contrast = clahe.apply(gray)
-  # 3. 샤프닝
-  kernel = np.array([[0, -1, 0],
-                     [-1, 5, -1],
-                     [0, -1, 0]])
-  sharpened = cv2.filter2D(contrast, -1, kernel)
-  # # 4. 이진화 (Otsu Threshold)
-  # _, binary = cv2.threshold(
-  #     sharpened, 0, 255,
-  #     cv2.THRESH_BINARY + cv2.THRESH_OTSU
-  # )
-  # 저장
-  cv2.imwrite(output_path, sharpened)
+  # # 2. 대비 향상 (CLAHE)
+  # clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+  # contrast = clahe.apply(gray)
+  # # 3. 샤프닝
+  # kernel = np.array([[0, -1, 0],
+  #                    [-1, 5, -1],
+  #                    [0, -1, 0]])
+  # sharpened = cv2.filter2D(contrast, -1, kernel)
+  # # # 4. 이진화 (Otsu Threshold)
+  # # _, binary = cv2.threshold(
+  # #     sharpened, 0, 255,
+  # #     cv2.THRESH_BINARY + cv2.THRESH_OTSU
+  # # )
+  # # 저장
+  cv2.imwrite(output_path, gray)
   log_event("preprocess_image", "END", "COMPLETED", path=output_path)
 
 
-def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75, chk_cnt=5):
+
+def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75, chk_cnt=5, gray=False):
   level = logging.DEBUG if temp_img_list == ["hunting.png"] else logging.INFO
   log_event("img_matchTemplate", "START", level=level, templates=len(temp_img_list), max_checks=chk_cnt)
 
@@ -211,13 +212,17 @@ def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75, chk_c
     img = cv2.cvtColor(np.array(target_pil), cv2.COLOR_RGB2BGR)
 
     # 전처리
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    contrast = clahe.apply(gray)
-    kernel = np.array([[0, -1, 0],
-                       [-1, 5, -1],
-                       [0, -1, 0]])
-    sharpened = cv2.filter2D(contrast, -1, kernel)
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    if gray:
+      processed_img = gray_img
+    else:
+      clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+      contrast = clahe.apply(gray_img)
+      kernel = np.array([[0, -1, 0],
+                         [-1, 5, -1],
+                         [0, -1, 0]])
+      processed_img = cv2.filter2D(contrast, -1, kernel)
 
     # 템플릿 검색
     for title in temp_img_list:
@@ -235,15 +240,21 @@ def img_matchTemplate(temp_img_list, x, y, width, height, confidence=0.75, chk_c
 
       try:
         result = cv2.matchTemplate(
-          sharpened, template_img, cv2.TM_CCOEFF_NORMED
+          processed_img, template_img, cv2.TM_CCOEFF_NORMED
         )
       except Exception as e:
         raise RuntimeError(f"템플릿매칭 오류 발생: {e}") from e
 
       _, max_val, _, max_loc = cv2.minMaxLoc(result)
+      print(f"image={title} check={cnt+1} max_val={max_val:.3f} confidence={confidence}")
 
       if max_val >= confidence:
-        log_event("img_matchTemplate", "END", "FOUND", level=level, image=title, score=round(max_val, 3), checks=cnt + 1)
+        print("MATCH SUCCESS")
+        log_event(
+          "img_matchTemplate", "END", "FOUND",
+          level=level, image=title,
+          score=round(float(max_val), 3), checks=cnt + 1
+        )
         return True, (title, max_val, max_loc)
 
     # 마지막 검사에서는 기다릴 필요 없음

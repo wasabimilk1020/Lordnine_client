@@ -46,7 +46,7 @@ def start_attack():
       "start_attack", "STATE",
       "ATTACK_STARTED" if attack_success else "ATTACK_NOT_STARTED"
     )
-
+    #이 부분 계속 공격 클릭이 안되면 그떄는 오렌지인지 회색인지 체크 한 후 클릭을 다시 한번 하도록 구현해야함. 오렌지, 회색 둘다 체크하는게 중요.
     if not attack_success:
       return False, "공격 활성화 실패"
 
@@ -59,12 +59,18 @@ def start_attack():
     return False, "공격 버튼 상태 충돌"
 
 
-
 @trace_step
-def move_on_map(x, y, width=3, height=3, delay=1):
+def move_on_map(x, y, width=3, height=3, delay=1, move_max_checks=50, move_check_delay=1):
+  # ===== 이동 확인 인자 검사 =====
+  if not isinstance(move_max_checks, int) or isinstance(move_max_checks, bool) or move_max_checks <= 0:
+    raise ValueError("move_max_checks는 양의 정수여야 함")
+
+  if not isinstance(move_check_delay, (int, float)) or isinstance(move_check_delay, bool) or move_check_delay < 0:
+    raise ValueError("move_check_delay는 0 이상의 숫자여야 함")
+
   # ===== 지도 열기 (최대 2번 시도) =====
   for attempt in range(2):
-    log_event('move_on_map', 'OPEN_ATTEMPT', attempt=attempt + 1)
+    log_event("move_on_map", "OPEN_ATTEMPT", attempt=attempt + 1)
     keyboard('m')
 
     # 지도 UI 확인 1
@@ -102,8 +108,22 @@ def move_on_map(x, y, width=3, height=3, delay=1):
       return False, "지도 열기 실패"
 
   # ===== 지도에서 위치 클릭 =====
-  log_event("move_on_map", "ACTION", "CLICK_REQUESTED", x=x, y=y, width=width, height=height)
+  log_event(
+    "move_on_map", "ACTION", "CLICK_REQUESTED",
+    x=x, y=y, width=width, height=height
+  )
   randClick(x, y, width, height, delay)
+
+  success, match_data = img_search_utils.img_matchTemplate(["map_clicked.png"], x-50, y-50, 100, 100, confidence=0.70, gray=True) #좌표 클릭 확인
+  print("좌표 클릭:", match_data)
+  if not success:
+    return False, "좌표 클릭 실패"
+
+  title, score, location = match_data
+  log_event(
+    "move_on_map", "CLICK_VERIFY", "FOUND",
+    image=title, score=round(float(score), 3), location=location
+  )
 
   # ===== 지도 닫기 =====
   log_event("move_on_map", "CLOSE_ATTEMPT", attempt=1)
@@ -138,7 +158,6 @@ def move_on_map(x, y, width=3, height=3, delay=1):
       return False, "지도 닫기 실패"
 
     # 지도 이미지 모두 미검출 → 기본 화면 확인
-    # normal_success라는게 지도에서 나와 일반 ui에서 이미지 체크를 수행하는 것을 뜻함
     normal_success, _ = img_search_utils.searchImg(
       'map_chk_3.png',
       beforeDelay=0, afterDelay=0,
@@ -146,11 +165,46 @@ def move_on_map(x, y, width=3, height=3, delay=1):
     )
 
     if normal_success:
-      return True, "지도 조작 루틴 완료"
+      break
 
     return False, "지도 상태 확인 실패"
 
-  return False, "지도 닫기 실패"
+  else:
+    return False, "지도 닫기 실패"
+
+  # ===== 자동 이동 완료 대기 =====
+  log_event(
+    "auto_move_wait", "WAIT_START",
+    image="auto_move_chk.png",
+    max_checks=move_max_checks,
+    check_delay=move_check_delay
+  )
+
+  for i in range(move_max_checks):
+    success, _ = img_search_utils.searchImg(
+      'auto_move_chk.png',
+      beforeDelay=0,
+      afterDelay=move_check_delay,
+      justChk=True,
+      _region=(830, 600, 300, 150)
+    )
+
+    # 이동 중 표시가 사라지면 이동 완료로 판단
+    if not success:
+      break
+
+  log_event(
+    "auto_move_wait", "WAIT_END",
+    "LIMIT_REACHED" if success else "NOT_FOUND",
+    checks=i + 1,
+    max_checks=move_max_checks
+  )
+
+  if success:
+    return False, "자동 이동 완료 확인 실패 (최대 검사 횟수 초과)"
+
+  return True, "지도 이동 완료"
+
 
 
 # data=[1142, 375, 10, 10, 0.0]=[x,y,xRange,yRange,delay]
@@ -220,13 +274,6 @@ def normalHunting(sio, data, btn_name, character_name, handle):
   success, message = move_on_map(835, 690, 3, 3, 1)
   if not success:
     return False, {"message": message}
-
-  log_event("auto_move_wait", "WAIT_START", image="auto_move_chk.png", max_checks=50)
-  for i in range(50):
-    success, _ = img_search_utils.searchImg('auto_move_chk.png', beforeDelay=0, afterDelay=1, justChk=True, _region=(830,600,300,150))
-    if not success:
-      break
-  log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED" if success else "NOT_FOUND", checks=i + 1)
 
   #공격
   success, message = start_attack()
@@ -471,7 +518,7 @@ def world_boss(sio, data, btn_name, character_name, handle):
   log_event("auto_move_wait", "WAIT_END", "LIMIT_REACHED" if success else "NOT_FOUND", checks=i + 1)
 
   keyboard('w',4000)  #앞으로 4초간 이동
-  
+
   #공격
   success, message = start_attack()
   if not success:
