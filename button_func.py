@@ -326,10 +326,10 @@ def dungeon(sio, data, btn_name, character_name, handle):
       return False, {"message": "이동 체크 실패"}
     time.sleep(2)
 
-    #지도 열고 이동
-    success, message = move_on_map(960,700,3,3,1)
-    if not success:
-      return False, {"message": message}
+    # #지도 열고 이동
+    # success, message = move_on_map(960,700,3,3,1)
+    # if not success:
+    #   return False, {"message": message}
 
     #공격
     success, message = start_attack()
