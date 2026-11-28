@@ -10,9 +10,9 @@ char input_data[5][21];
 int idx = 0;
 
 // 클릭 및 키보드 딜레이
-#define CLICK_HOLD_MS 90
-#define KEY_HOLD_MS   90
-#define KEY_GAP_MS    10
+#define CLICK_HOLD_MS random(90, 120)
+#define KEY_HOLD_MS   random(90, 120)
+#define KEY_GAP_MS    random(10,15)
 
 void setup() {
     Serial.begin(9600);
@@ -110,7 +110,7 @@ void handleCommand() {
         MouseTo.setTarget(x, y, false);
         while (!MouseTo.move()) {}
     
-        delay(50);  // 이동 완료 후 50ms 대기
+        delay(100);  // 이동 완료 후 50ms 대기
         Mouse.press(MOUSE_LEFT);
         delay(CLICK_HOLD_MS);
         Mouse.release(MOUSE_LEFT);
