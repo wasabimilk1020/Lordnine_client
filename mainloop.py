@@ -20,7 +20,8 @@ def mainLoop(sio, btn_func, func_data, id_handle, btn_name):
   try:
     for character_name, handle in id_handle:
       run_id = next(_run_counter)
-      set_context(run_id, character_name, handle, btn_name) #threading.local()에 변수 할당. 
+      set_context(run_id, character_name, handle, btn_name)
+
       logging.info(
         "run=%s char=%s handle=%s routine=%s event=START",
         run_id, character_name, handle, btn_name
@@ -34,10 +35,11 @@ def mainLoop(sio, btn_func, func_data, id_handle, btn_name):
         continue
 
       result = "UNKNOWN"
+
       try:
         sio.emit("logEvent", [f"{btn_name} 시작", character_name, STATUS_MSG])
 
-        # 윈도우 앞으로 가져오기 (기존 반환값 유지)
+        # 윈도우 앞으로 가져오기
         success, message = img_search_utils.getWindow(handle)
         if not success:
           result = "WINDOW_ACTIVATION_FAILED"
@@ -46,7 +48,11 @@ def mainLoop(sio, btn_func, func_data, id_handle, btn_name):
 
         # 절전 해제 및 사망 체크
         if btn_name != "status_check_button":
-          waking_from_sleep_and_deathChk(sleep_time=2)
+          success, message = waking_from_sleep_and_deathChk(sleep_time=2)
+          if not success:
+            result = "WAKE_FAILED"
+            sio.emit("logEvent", [message, character_name, ERR_MSG])
+            continue
 
         # 버튼 루틴 실행
         success, data = btn_func(
@@ -64,7 +70,9 @@ def mainLoop(sio, btn_func, func_data, id_handle, btn_name):
         message = data["message"]
 
         if action == "sleep":
-          sleep_success, _ = go_to_sleep_and_huntingChk(btn_name, character_name, sio)
+          sleep_success, _ = go_to_sleep_and_huntingChk(
+            btn_name, character_name, sio
+          )
           result = "SUCCESS" if sleep_success else "SLEEP_FAILED"
 
         elif action == "status":
@@ -79,17 +87,26 @@ def mainLoop(sio, btn_func, func_data, id_handle, btn_name):
 
       except Exception as e:
         result = "EXCEPTION"
-        logging.exception("run=%s char=%s routine=%s event=ERROR", run_id, character_name, btn_name)
+        logging.exception(
+          "run=%s char=%s routine=%s event=ERROR",
+          run_id, character_name, btn_name
+        )
         sio.emit("logEvent", [f"루틴 실행 오류: {e}", character_name, ERR_MSG])
         continue
 
       finally:
+        # 실패 또는 예외 발생 시 화면 캡처
+        if result in (
+          "WINDOW_ACTIVATION_FAILED",
+          "WAKE_FAILED",
+          "ROUTINE_FAILED",
+          "SLEEP_FAILED",
+          "EXCEPTION"
+        ):
+          img_search_utils.capture_failure(character_name, run_id)
+
         logging.info("run=%s event=END result=%s", run_id, result)
-        
         clear_context()
+
   finally:
     sio.emit("task_finished", btn_name)
-  
-
-
-    

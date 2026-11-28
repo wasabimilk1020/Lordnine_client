@@ -83,6 +83,31 @@ def caputure_image(name,x,y,sio):
   sio.emit("captured_image",data)
   log_event("capture_image", "END", "SENT", character=name)
 
+def capture_failure(name, run_id):
+  try:
+    log_event("capture_failure", "START")
+
+    now = datetime.datetime.now()
+    timestamp = now.strftime("%Y%m%d_%H%M%S_%f")
+    filename = f"{timestamp}_run{run_id}_{name}.png"
+
+    full_path = utils.file_path(filename, "logs", "screenshots")
+
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+
+    pyautogui.screenshot(full_path)
+
+    log_event("capture_failure", "END", "SAVED", path=full_path)
+
+    return True, full_path
+
+  except Exception as e:
+    logging.exception(
+      "run=%s char=%s step=capture_failure event=EXCEPTION",
+      run_id, name
+    )
+    return False, str(e)
+
 # def getWindow(handle):
 #   try:
 #     time.sleep(0.1)

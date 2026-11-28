@@ -114,7 +114,7 @@ def move_on_map(x, y, width=3, height=3, delay=1, move_max_checks=50, move_check
   )
   randClick(x, y, width, height, delay)
 
-  success, match_data = img_search_utils.img_matchTemplate(["map_clicked.png"], x-50, y-50, 100, 100, confidence=0.60, gray=True) #좌표 클릭 확인
+  success, match_data = img_search_utils.img_matchTemplate(["map_clicked.png"], x-50, y-50, 100, 100, confidence=0.50, gray=True) #좌표 클릭 확인
   print("좌표 클릭:", match_data)
   if not success:
     return False, "좌표 클릭 실패"
@@ -216,12 +216,15 @@ def statusChk(sio, data, btn_name, character_name, handle):
 
   success, hunting_status = check_hunting.checkHunting()
 
-  if not success or hunting_status == "rest":  # 사냥 중이 아니거나 휴식 중
-    waking_from_sleep_and_deathChk(sleep_time=2)
-    result = normalHunting(sio, data, btn_name, character_name, handle)
-    return result
+  if not success or hunting_status == "rest":
+    success, message = waking_from_sleep_and_deathChk(sleep_time=2)
 
-  else:  # 사냥 중
+    if not success:
+      return False, {"message": message}
+
+    return normalHunting(sio, data, btn_name, character_name, handle)
+
+  else:
     return True, {"action": "status", "message": hunting_status}
 
 
